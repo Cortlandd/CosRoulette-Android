@@ -19,10 +19,11 @@ class NewFilterDialogFragment: DialogFragment() {
     var newFilterDialogListener: NewFilterDialogListener? = null
 
     companion object {
-        fun newInstance(title: Int): NewFilterDialogFragment {
+        fun newInstance(title: Int, selected: String?): NewFilterDialogFragment {
             val newFilterDialogFragment = NewFilterDialogFragment()
             val args = Bundle()
             args.putInt("dialog_title", title)
+            args.putString("selected_item", selected)
             newFilterDialogFragment.arguments = args
             return newFilterDialogFragment
         }
@@ -30,11 +31,14 @@ class NewFilterDialogFragment: DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val title = arguments!!.getInt("dialog_title")
+        val selectedText = arguments!!.getString("selected_item")
         val builder = AlertDialog.Builder(this!!.activity!!)
         builder.setTitle(title)
 
         val dialogView = activity?.layoutInflater?.inflate(R.layout.dialog_new_filter, null)
         val filter = dialogView!!.findViewById<EditText>(R.id.filter)
+
+        filter.setText(selectedText)
 
         builder.setView(dialogView)
                 .setPositiveButton("Save") { dialog, id ->

@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/edit_item"
+        android:title="Edit Filter"
+        android:icon="@android:drawable/ic_menu_edit"
+        android:visible="false"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/delete_item"
+        android:title="Delete Filter"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:visible="false"
+        app:showAsAction="always"/>
+
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

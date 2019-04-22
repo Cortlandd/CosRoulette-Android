@@ -19,12 +19,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.pierfrancescosoffritti.youtubeplayer.player.YouTubePlayerView
+            <com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayerView
                 android:id="@+id/player_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <Button
+                android:id="@+id/search_button"
                 android:text="Search"
                 android:layout_below="@id/player_view"
                 android:layout_width="wrap_content"
