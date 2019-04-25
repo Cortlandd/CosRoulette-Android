@@ -47,6 +47,22 @@
 
         </RelativeLayout>
 
+        <RelativeLayout
+            android:visibility="gone"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <fragment
+                android:id="@+id/carousel_fragment_id"
+                class="com.makeuproulette.android.CarouselFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </fragment>
+
+
+        </RelativeLayout>
+
 
     </LinearLayout>
 
