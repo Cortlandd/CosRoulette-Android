@@ -4,12 +4,12 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.design.widget.NavigationView
-import android.support.v4.app.DialogFragment
-import android.support.v4.view.GravityCompat
-import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.navigation.NavigationView
+import androidx.fragment.app.DialogFragment
+import androidx.core.view.GravityCompat
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var selectedItem = -1
     var fullScreenHelper: FullScreenHelper = FullScreenHelper(this)
 
-    override fun onDialogPositiveClick(dialog: DialogFragment, filter: String) {
+    override fun onDialogPositiveClick(dialog: androidx.fragment.app.DialogFragment, filter: String) {
 
         if ("newfilter" == dialog.tag) {
             filterListItems.add(filter)
@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
-    override fun onDialogNegativeClick(dialog: DialogFragment) {
+    override fun onDialogNegativeClick(dialog: androidx.fragment.app.DialogFragment) {
         Snackbar.make(fab, "Cancelled", Snackbar.LENGTH_LONG).setAction("Action", null).show()
     }
 

@@ -1,9 +1,9 @@
 package com.makeuproulette.android.activities
 
 import android.os.Bundle
-import android.support.design.widget.TabLayout
-import android.support.v4.view.ViewPager
-import android.support.v7.app.AppCompatActivity
+import com.google.android.material.tabs.TabLayout
+import androidx.viewpager.widget.ViewPager
+import androidx.appcompat.app.AppCompatActivity
 import com.makeuproulette.android.fragments.FAQFragment
 import com.makeuproulette.android.fragments.LicensesFragment
 import com.makeuproulette.android.R
@@ -14,7 +14,7 @@ class AboutActivity : AppCompatActivity() {
 
     var mSectionsPageAdapter: SectionsPageAdapter? = null
 
-    var mViewPager: ViewPager? = null
+    var mViewPager: androidx.viewpager.widget.ViewPager? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,7 +23,7 @@ class AboutActivity : AppCompatActivity() {
 
         mSectionsPageAdapter = SectionsPageAdapter(supportFragmentManager)
 
-        mViewPager = findViewById<ViewPager>(R.id.container)
+        mViewPager = findViewById<androidx.viewpager.widget.ViewPager>(R.id.container)
         setupViewPager(mViewPager!!)
 
         val tabs: TabLayout = findViewById(R.id.tabs)
@@ -35,7 +35,7 @@ class AboutActivity : AppCompatActivity() {
 
     }
 
-    fun setupViewPager(viewPager: ViewPager) {
+    fun setupViewPager(viewPager: androidx.viewpager.widget.ViewPager) {
         var adapter: SectionsPageAdapter = SectionsPageAdapter(supportFragmentManager)
         adapter.addFragment(FAQFragment(), "FAQ")
         adapter.addFragment(LicensesFragment(), "Open Source Licenses")

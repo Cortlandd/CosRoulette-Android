@@ -1,15 +1,15 @@
 package com.makeuproulette.android.adapters
 
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 
-class SectionsPageAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+class SectionsPageAdapter(fm: androidx.fragment.app.FragmentManager) : androidx.fragment.app.FragmentPagerAdapter(fm) {
 
-    private val mFragmentList: ArrayList<Fragment> = ArrayList()
+    private val mFragmentList: ArrayList<androidx.fragment.app.Fragment> = ArrayList()
     private val mFragmentTitleList: ArrayList<String> = ArrayList()
 
-    fun addFragment(fragment: Fragment, title: String) {
+    fun addFragment(fragment: androidx.fragment.app.Fragment, title: String) {
         mFragmentList.add(fragment)
         mFragmentTitleList.add(title)
     }
@@ -18,7 +18,7 @@ class SectionsPageAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
         return mFragmentTitleList.get(position)
     }
 
-    override fun getItem(position: Int): Fragment {
+    override fun getItem(position: Int): androidx.fragment.app.Fragment {
         return mFragmentList.get(position)
     }
 

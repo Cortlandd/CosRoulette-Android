@@ -4,16 +4,16 @@ package com.makeuproulette.android.fragments
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
-import android.support.v7.app.AlertDialog
+import androidx.fragment.app.DialogFragment
+import androidx.appcompat.app.AlertDialog
 import android.widget.EditText
 import com.makeuproulette.android.R
 
-class NewFilterDialogFragment: DialogFragment() {
+class NewFilterDialogFragment: androidx.fragment.app.DialogFragment() {
 
     interface NewFilterDialogListener {
-        fun onDialogPositiveClick(dialog: DialogFragment, filter: String)
-        fun onDialogNegativeClick(dialog: DialogFragment)
+        fun onDialogPositiveClick(dialog: androidx.fragment.app.DialogFragment, filter: String)
+        fun onDialogNegativeClick(dialog: androidx.fragment.app.DialogFragment)
     }
 
     var newFilterDialogListener: NewFilterDialogListener? = null
