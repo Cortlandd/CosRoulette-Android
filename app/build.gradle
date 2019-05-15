@@ -38,7 +38,7 @@ dependencies {
     //api group: 'com.google.apis', name: 'google-api-services-youtube', version: 'v3-rev198-1.23.0'
 
     // Using alternative video player that is more up to date
-    implementation 'com.github.PierfrancescoSoffritti:AndroidYouTubePlayer:8.0.1'
+    implementation 'com.github.PierfrancescoSoffritti:AndroidYouTubePlayer:10.0.3'
 
     // Kotlin HTTP library
     implementation 'com.github.kittinunf.fuel:fuel-android:2.0.0'

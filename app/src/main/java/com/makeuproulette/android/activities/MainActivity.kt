@@ -2,11 +2,9 @@ package com.makeuproulette.android.activities
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.content.res.Configuration
 import android.os.Bundle
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
-import androidx.fragment.app.DialogFragment
 import androidx.core.view.GravityCompat
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -24,13 +22,11 @@ import com.makeuproulette.android.utils.FullScreenHelper
 import com.makeuproulette.android.fragments.NewFilterDialogFragment
 import com.makeuproulette.android.R
 import com.makeuproulette.android.networking.YouTube
-import com.pierfrancescosoffritti.androidyoutubeplayer.player.PlayerConstants
-import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayerView
-import com.pierfrancescosoffritti.androidyoutubeplayer.player.listeners.AbstractYouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.player.listeners.YouTubePlayerFullScreenListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.utils.YouTubePlayerTracker
-import com.pierfrancescosoffritti.androidyoutubeplayer.utils.Utils
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerFullScreenListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.utils.loadOrCueVideo
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import org.jetbrains.anko.doAsyncResult
@@ -39,8 +35,6 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, NewFilterDialogFragment.NewFilterDialogListener, View.OnClickListener {
-
-    // TODO: Resolve issue of changing orientation removing all filters.
 
     // Array of filters
     private var filterListItems = ArrayList<String>()
@@ -67,7 +61,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             filterListItems.add(filter)
             listAdapter?.notifyDataSetChanged()
 
-            Snackbar.make(fab, "Filter Added", Snackbar.LENGTH_LONG).setAction("Action", null).show()
+            // TODO: Decide if these are really necessary
+            //Snackbar.make(fab, "Filter Added", Snackbar.LENGTH_LONG).setAction("Action", null).show()
         } else if ("updatefilter" == dialog.tag) {
             filterListItems[selectedItem] = filter
 
@@ -75,7 +70,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             selectedItem = -1
 
-            Snackbar.make(fab, "Filter Updated", Snackbar.LENGTH_LONG).setAction("Action", null).show()
+            // TODO: Decide if these are really necessary
+            //Snackbar.make(fab, "Filter Updated", Snackbar.LENGTH_LONG).setAction("Action", null).show()
         }
 
     }
@@ -107,7 +103,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onPause() {
         super.onPause()
 
-        if (playerView!!.isFullScreen) {
+        if (playerView!!.isFullScreen()) {
             playerView!!.exitFullScreen()
         }
 
@@ -116,26 +112,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun initYoutubePlayerView() {
 
         playerView = findViewById(R.id.player_view)
+        lifecycle.addObserver(playerView!!)
 
-        playerView?.initialize({ youTubePlayer ->
-            youTubePlayer.addListener(object: AbstractYouTubePlayerListener() {
-                override fun onReady() {
-                    super.onReady()
-                    youTubePlayer.cueVideo("", 0f)
-                    initializedYouTubePlayer = youTubePlayer
-                    addFullScreenListener()
-                    searchButton?.visibility = VISIBLE
-                }
+        playerView?.addYouTubePlayerListener(object: AbstractYouTubePlayerListener() {
+            override fun onReady(youTubePlayer: YouTubePlayer) {
+                super.onReady(youTubePlayer)
+                youTubePlayer.loadOrCueVideo(lifecycle, "", 0f)
+                initializedYouTubePlayer = youTubePlayer
+                addFullScreenListener()
+                searchButton?.visibility = VISIBLE
+            }
+        })
 
-                override fun onStateChange(state: PlayerConstants.PlayerState) {
-                    super.onStateChange(state)
-
-                }
-            })
-        }, true)
-
-        playerView?.let { lifecycle.addObserver(it) }
-        //lifecycle.addObserver(playerView)
 
     }
 
@@ -144,11 +132,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         playerView!!.addFullScreenListener(object: YouTubePlayerFullScreenListener {
             override fun onYouTubePlayerEnterFullScreen() {
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
-                    window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
-                }
                 fab.hide()
                 supportActionBar?.hide()
+                window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                 fullScreenHelper.enterFullScreen()
             }
 
@@ -169,7 +155,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             allFiltersStringText = filterListItems.joinToString(" ")
             Log.i("R allFiltersStringText", allFiltersStringText)
 
-            var search_params = listOf(
+            var searchParams = listOf(
                     "q" to "makeup tutorials $allFiltersStringText",
                     "part" to "id, snippet",
                     "key" to YouTube.API_KEY,
@@ -180,12 +166,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             if (youtubeArray.isEmpty()) {
 
                 doAsyncResult {
-                    val r = YouTube.search_youtube(search_params)
+                    val r = YouTube.search_youtube(searchParams)
                     uiThread {
                         youtubeArray.addAll(r)
-                        var randomVid: String = youtubeArray[Random().nextInt(youtubeArray.size)]
+                        val randomVid: String = youtubeArray[Random().nextInt(youtubeArray.size)]
                         initializedYouTubePlayer!!.loadVideo(randomVid, 0f)
-                        System.out.println("Playing Video: " + randomVid)
+                        System.out.println("Playing Video: $randomVid")
                         // Get random element position
                         val randomVidIndex = youtubeArray.indexOf(randomVid)
                         // Remove random element from list
@@ -198,7 +184,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             if (!youtubeArray.isEmpty()) {
 
                 // Get random string videoId from youtube array
-                var randomVid: String = youtubeArray[Random().nextInt(youtubeArray.size)]
+                val randomVid: String = youtubeArray[Random().nextInt(youtubeArray.size)]
 
                 // Play video with random array
                 initializedYouTubePlayer!!.loadVideo(randomVid, 0f)
@@ -228,7 +214,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         nav_view.setNavigationItemSelectedListener(this)
     }
 
-    fun showNewFilterUI() {
+    private fun showNewFilterUI() {
         val newFragment = NewFilterDialogFragment.newInstance(R.string.add_new_filter_dialog_title, null)
         newFragment.show(supportFragmentManager, "newfilter")
     }
@@ -242,7 +228,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
-        } else if(playerView!!.isFullScreen) {
+        } else if(playerView!!.isFullScreen()) {
             playerView!!.exitFullScreen()
         } else {
             super.onBackPressed()
@@ -283,7 +269,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 listAdapter?.notifyDataSetChanged()
                 youtubeArray.clear()
                 selectedItem = -1
-                Snackbar.make(fab, "Filter removed", Snackbar.LENGTH_LONG).setAction("Action", null).show()
+                // TODO: Decide if these are really necessary
+                //Snackbar.make(fab, "Filter removed", Snackbar.LENGTH_LONG).setAction("Action", null).show()
             }
         }
         return super.onOptionsItemSelected(item)
