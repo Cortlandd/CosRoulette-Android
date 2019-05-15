@@ -1,4 +1,4 @@
-package com.makeuproulette.android
+package com.makeuproulette.android.data
 
 import com.github.kittinunf.fuel.core.ResponseDeserializable
 import com.google.gson.Gson

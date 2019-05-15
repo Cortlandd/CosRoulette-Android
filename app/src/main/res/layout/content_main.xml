@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".MainActivity"
+    tools:context=".activities.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
     <LinearLayout
@@ -24,12 +24,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <Button
-                android:id="@+id/search_button"
-                android:text="Search"
-                android:layout_below="@id/player_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
 
         </RelativeLayout>
 
@@ -44,8 +38,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
-
         </RelativeLayout>
+
+        <Button
+            android:id="@+id/search_button"
+            android:visibility="gone"
+            android:text="Search"
+            android:layout_gravity="bottom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
 
     </LinearLayout>

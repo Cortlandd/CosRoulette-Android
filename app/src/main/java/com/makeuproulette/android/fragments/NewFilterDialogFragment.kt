@@ -1,4 +1,4 @@
-package com.makeuproulette.android
+package com.makeuproulette.android.fragments
 
 
 import android.app.Dialog
@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.support.v4.app.DialogFragment
 import android.support.v7.app.AlertDialog
 import android.widget.EditText
-import org.jetbrains.anko.find
+import com.makeuproulette.android.R
 
 class NewFilterDialogFragment: DialogFragment() {
 

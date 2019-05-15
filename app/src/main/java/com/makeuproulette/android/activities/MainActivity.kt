@@ -1,7 +1,8 @@
-package com.makeuproulette.android
+package com.makeuproulette.android.activities
 
-import android.arch.lifecycle.Lifecycle
-import android.database.DataSetObserver
+import android.content.Intent
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
@@ -13,20 +14,27 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.View.VISIBLE
+import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
+import com.makeuproulette.android.utils.FullScreenHelper
+import com.makeuproulette.android.fragments.NewFilterDialogFragment
+import com.makeuproulette.android.R
+import com.makeuproulette.android.networking.YouTube
+import com.pierfrancescosoffritti.androidyoutubeplayer.player.PlayerConstants
 import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.player.YouTubePlayerView
 import com.pierfrancescosoffritti.androidyoutubeplayer.player.listeners.AbstractYouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.player.listeners.YouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.player.listeners.YouTubePlayerFullScreenListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.utils.YouTubePlayerTracker
+import com.pierfrancescosoffritti.androidyoutubeplayer.utils.Utils
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.doAsyncResult
 import org.jetbrains.anko.uiThread
-import org.jetbrains.anko.videoView
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -51,6 +59,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var allFiltersStringText: String = ""
     private var showMenuItems = false
     private var selectedItem = -1
+    var fullScreenHelper: FullScreenHelper = FullScreenHelper(this)
 
     override fun onDialogPositiveClick(dialog: DialogFragment, filter: String) {
 
@@ -95,9 +104,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
-    fun initYoutubePlayerView() {
+    override fun onPause() {
+        super.onPause()
 
-        playerView?.let { lifecycle.addObserver(it) }
+        if (playerView!!.isFullScreen) {
+            playerView!!.exitFullScreen()
+        }
+
+    }
+
+    private fun initYoutubePlayerView() {
 
         playerView = findViewById(R.id.player_view)
 
@@ -107,10 +123,43 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     super.onReady()
                     youTubePlayer.cueVideo("", 0f)
                     initializedYouTubePlayer = youTubePlayer
+                    addFullScreenListener()
+                    searchButton?.visibility = VISIBLE
+                }
+
+                override fun onStateChange(state: PlayerConstants.PlayerState) {
+                    super.onStateChange(state)
+
                 }
             })
         }, true)
 
+        playerView?.let { lifecycle.addObserver(it) }
+        //lifecycle.addObserver(playerView)
+
+    }
+
+    private fun addFullScreenListener() {
+
+        playerView!!.addFullScreenListener(object: YouTubePlayerFullScreenListener {
+            override fun onYouTubePlayerEnterFullScreen() {
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
+                    window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                }
+                fab.hide()
+                supportActionBar?.hide()
+                fullScreenHelper.enterFullScreen()
+            }
+
+            override fun onYouTubePlayerExitFullScreen() {
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                fab.show()
+                supportActionBar?.show()
+                window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+                fullScreenHelper.exitFullScreen()
+            }
+        })
     }
 
     override fun onClick(v: View?) {
@@ -169,7 +218,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    fun initializeWidgets() {
+    private fun initializeWidgets() {
         fab.setOnClickListener { showNewFilterUI() }
 
         val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
@@ -193,6 +242,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
+        } else if(playerView!!.isFullScreen) {
+            playerView!!.exitFullScreen()
         } else {
             super.onBackPressed()
         }
@@ -233,8 +284,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 youtubeArray.clear()
                 selectedItem = -1
                 Snackbar.make(fab, "Filter removed", Snackbar.LENGTH_LONG).setAction("Action", null).show()
-            } else if (R.id.action_settings == item.itemId) {
-                return true
             }
         }
         return super.onOptionsItemSelected(item)
@@ -244,22 +293,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.nav_camera -> {
-                // Handle the camera action
-            }
-            R.id.nav_gallery -> {
+            R.id.nav_contact -> {
 
             }
-            R.id.nav_slideshow -> {
-
+            R.id.nav_about -> {
+                val i: Intent = Intent(this, AboutActivity::class.java)
+                startActivity(i)
             }
-            R.id.nav_manage -> {
-
-            }
-            R.id.nav_share -> {
-
-            }
-            R.id.nav_send -> {
+            R.id.nav_donate -> {
 
             }
         }

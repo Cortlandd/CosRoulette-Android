@@ -1,10 +1,12 @@
-package com.makeuproulette.android
+package com.makeuproulette.android.networking
 
 
 import android.util.Log
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.result.Result
+import com.makeuproulette.android.data.YouTubeSearchResponse
+import com.makeuproulette.android.data.YouTubeVideoResponse
 import java.util.*
 
 class YouTube {
