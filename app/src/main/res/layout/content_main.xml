@@ -32,6 +32,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
+            <TextView
+                android:id="@+id/add_filter_notice"
+                android:layout_margin="10dp"
+                android:textSize="20dp"
+                android:text="Click the Add button below to add filters."
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <ListView
                 android:id="@+id/filter_list"
@@ -47,7 +55,6 @@
             android:layout_gravity="bottom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-
 
     </LinearLayout>
 

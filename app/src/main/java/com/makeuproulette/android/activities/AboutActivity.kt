@@ -8,6 +8,7 @@ import com.makeuproulette.android.fragments.FAQFragment
 import com.makeuproulette.android.fragments.LicensesFragment
 import com.makeuproulette.android.R
 import com.makeuproulette.android.adapters.SectionsPageAdapter
+import com.makeuproulette.android.fragments.AboutFragment
 import kotlinx.android.synthetic.main.activity_about.*
 
 class AboutActivity : AppCompatActivity() {
@@ -37,6 +38,7 @@ class AboutActivity : AppCompatActivity() {
 
     fun setupViewPager(viewPager: androidx.viewpager.widget.ViewPager) {
         var adapter: SectionsPageAdapter = SectionsPageAdapter(supportFragmentManager)
+        adapter.addFragment(AboutFragment(), "About")
         adapter.addFragment(FAQFragment(), "FAQ")
         adapter.addFragment(LicensesFragment(), "Open Source Licenses")
         viewPager.adapter = adapter

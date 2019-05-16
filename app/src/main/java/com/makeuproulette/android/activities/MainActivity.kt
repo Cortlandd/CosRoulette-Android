@@ -12,12 +12,10 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.WindowManager
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.ListView
+import android.widget.*
 import com.makeuproulette.android.utils.FullScreenHelper
 import com.makeuproulette.android.fragments.NewFilterDialogFragment
 import com.makeuproulette.android.R
@@ -29,6 +27,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.utils.loadOrC
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.content_main.*
 import org.jetbrains.anko.doAsyncResult
 import org.jetbrains.anko.uiThread
 import java.util.*
@@ -54,6 +53,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var showMenuItems = false
     private var selectedItem = -1
     var fullScreenHelper: FullScreenHelper = FullScreenHelper(this)
+    private var addFilterNotice: TextView? = null
 
     override fun onDialogPositiveClick(dialog: androidx.fragment.app.DialogFragment, filter: String) {
 
@@ -77,7 +77,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onDialogNegativeClick(dialog: androidx.fragment.app.DialogFragment) {
-        Snackbar.make(fab, "Cancelled", Snackbar.LENGTH_LONG).setAction("Action", null).show()
+        // TODO: Decide if these are really necessary
+        //Snackbar.make(fab, "Cancelled", Snackbar.LENGTH_LONG).setAction("Action", null).show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,13 +91,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         searchButton = findViewById(R.id.search_button)
         searchButton?.setOnClickListener(this)
+        addFilterNotice = findViewById(R.id.add_filter_notice)
         listView = findViewById(R.id.filter_list)
+        listView?.emptyView = findViewById(R.id.add_filter_notice)
         listAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, filterListItems)
         listView?.adapter = listAdapter
         listView?.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id -> showUpdateFilterUI(position) }
 
         // Add "tutorials" to filter list by default
-        filterListItems.add("tutorial")
+        //filterListItems.add("tutorial")
 
     }
 
@@ -281,9 +284,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Handle navigation view item clicks here.
         when (item.itemId) {
             R.id.nav_contact -> {
-
+                val i: Intent = Intent(this, ContactActivity::class.java)
+                startActivity(i)
             }
-            R.id.nav_about -> {
+            R.id.nav_help -> {
                 val i: Intent = Intent(this, AboutActivity::class.java)
                 startActivity(i)
             }

@@ -13,7 +13,7 @@ import com.makeuproulette.android.R
  * A simple [Fragment] to display Open Source Licensing information.
  *
  */
-class LicensesFragment : androidx.fragment.app.Fragment() {
+class LicensesFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment

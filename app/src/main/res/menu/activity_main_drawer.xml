@@ -3,23 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single" android:visible="false">
+    <group android:checkableBehavior="single" android:visible="true">
         <item
-            android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
-        <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
-        <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
-        <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:id="@+id/nav_bookmarks"
+            android:icon="@android:drawable/ic_input_get"
+            android:title="Bookmarks" />
     </group>
 
     <item android:title="Information">
@@ -30,13 +18,13 @@
                 android:title="Contact" />
 
             <item
-                android:id="@+id/nav_about"
+                android:id="@+id/nav_help"
                 android:icon="@android:drawable/ic_dialog_info"
-                android:title="About" />
+                android:title="Help" />
         </menu>
     </item>
 
-    <item android:title="Contribution">
+    <item android:title="Contribute">
         <menu>
             <item
                 android:id="@+id/nav_donate"
