@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single" android:visible="true">
+    <group android:checkableBehavior="none" android:visible="true">
         <item
             android:id="@+id/nav_bookmarks"
             android:icon="@android:drawable/ic_input_get"
@@ -24,7 +24,7 @@
         </menu>
     </item>
 
-    <item android:title="Contribute">
+    <item android:title="Enjoy Makeup Roulette?">
         <menu>
             <item
                 android:id="@+id/nav_donate"

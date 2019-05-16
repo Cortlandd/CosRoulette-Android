@@ -3,7 +3,6 @@ package com.makeuproulette.android.activities
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
 import androidx.core.view.GravityCompat
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -12,22 +11,24 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.WindowManager
 import android.widget.*
 import com.makeuproulette.android.utils.FullScreenHelper
 import com.makeuproulette.android.fragments.NewFilterDialogFragment
 import com.makeuproulette.android.R
+import com.makeuproulette.android.database.BookmarksDBHelper
+import com.makeuproulette.android.database.model.BookmarkModel
+import com.makeuproulette.android.fragments.BookmarksFragment
 import com.makeuproulette.android.networking.YouTube
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerFullScreenListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.utils.YouTubePlayerTracker
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.utils.loadOrCueVideo
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
-import kotlinx.android.synthetic.main.content_main.*
 import org.jetbrains.anko.doAsyncResult
 import org.jetbrains.anko.uiThread
 import java.util.*
@@ -54,6 +55,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var selectedItem = -1
     var fullScreenHelper: FullScreenHelper = FullScreenHelper(this)
     private var addFilterNotice: TextView? = null
+    private var bookmarkButton: Button? = null
+    private var tracker = YouTubePlayerTracker()
 
     override fun onDialogPositiveClick(dialog: androidx.fragment.app.DialogFragment, filter: String) {
 
@@ -90,7 +93,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         initYoutubePlayerView()
 
         searchButton = findViewById(R.id.search_button)
+        bookmarkButton = findViewById(R.id.bookmark_button)
         searchButton?.setOnClickListener(this)
+        bookmarkButton?.setOnClickListener(this)
         addFilterNotice = findViewById(R.id.add_filter_notice)
         listView = findViewById(R.id.filter_list)
         listView?.emptyView = findViewById(R.id.add_filter_notice)
@@ -114,6 +119,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun initYoutubePlayerView() {
 
+
         playerView = findViewById(R.id.player_view)
         lifecycle.addObserver(playerView!!)
 
@@ -122,6 +128,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 super.onReady(youTubePlayer)
                 youTubePlayer.loadOrCueVideo(lifecycle, "", 0f)
                 initializedYouTubePlayer = youTubePlayer
+                initializedYouTubePlayer!!.addListener(tracker)
                 addFullScreenListener()
                 searchButton?.visibility = VISIBLE
             }
@@ -152,6 +159,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onClick(v: View?) {
+
+        if (v == bookmarkButton) {
+            var videoId = tracker.videoId
+            val dbHandler = BookmarksDBHelper(this, null)
+            val bookmark = BookmarkModel(videoId!!, "Test title", "Test URL")
+            dbHandler.addBookmark(bookmark)
+            val cursor = dbHandler.getAllVideoIds()
+            cursor!!.moveToFirst()
+            println(cursor.getString(cursor.getColumnIndex(BookmarksDBHelper.COLUMN_ID)))
+            println(cursor.getString(cursor.getColumnIndex(BookmarksDBHelper.COLUMN_TITLE)))
+            println(cursor.getString(cursor.getColumnIndex(BookmarksDBHelper.COLUMN_THUMBNAIL)))
+            cursor.close()
+            dbHandler.close()
+        }
 
         if (v == searchButton) {
 
@@ -283,6 +304,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
+            R.id.nav_bookmarks -> {
+                var bookmarksFragment = BookmarksFragment()
+                var fm = supportFragmentManager.beginTransaction()
+                bookmarksFragment.show(fm, "BOOKMARKS_TAG")
+            }
             R.id.nav_contact -> {
                 val i: Intent = Intent(this, ContactActivity::class.java)
                 startActivity(i)
