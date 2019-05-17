@@ -188,21 +188,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         if (v == bookmarkButton) {
 
-            val videoId = tracker.videoId
+            var videoId = ""
             var thumbnail = ""
             var title = ""
             var channelTitle = ""
 
-            if (bookmarkButton!!.isSelected) {
+            if (tracker.videoId == null) {
+                Snackbar.make(fab, "Search a Video to save as a Bookmark.", Snackbar.LENGTH_LONG).setAction("Action", null).show()
+                return
+            } else {
+                videoId = tracker.videoId!!
+            }
+
+            if (bookmarkButton!!.isSelected and (videoId != "")) {
                 val dbHandler = BookmarksDBHelper(this, null)
-                dbHandler.removeBookmark(videoId!!)
+                dbHandler.removeBookmark(videoId)
                 dbHandler.close()
                 bookmarkButton?.isSelected = false
             } else {
 
                 searchResult.forEach {
 
-                    if (it.values.contains(videoId!!)) {
+                    if (it.values.contains(videoId)) {
 
                         it.forEach { (key, value) ->
 
@@ -223,7 +230,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 }
                 val dbHandler = BookmarksDBHelper(this, null)
-                val bookmark = BookmarkModel(videoId!!, title, thumbnail, channelTitle)
+                val bookmark = BookmarkModel(videoId, title, thumbnail, channelTitle)
                 dbHandler.addBookmark(bookmark)
                 dbHandler.close()
                 bookmarkButton?.isSelected = true
