@@ -36,6 +36,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.utils.loadOrC
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
+import kotlinx.android.synthetic.main.content_main.*
 import org.jetbrains.anko.doAsyncResult
 import org.jetbrains.anko.uiThread
 import java.util.*
@@ -61,8 +62,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var showMenuItems = false
     private var selectedItem = -1
     private var fullScreenHelper: FullScreenHelper = FullScreenHelper(this)
-    private var addFilterNotice: TextView? = null
     private var bookmarkButton: ImageButton? = null
+    private var addFilterButton: Button? = null
     private var tracker = YouTubePlayerTracker()
     var bookmarksFragment = BookmarksFragment()
     var fm: FragmentManager? = null
@@ -109,9 +110,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         fm = supportFragmentManager
         searchButton = findViewById(R.id.search_button)
         searchButton?.setOnClickListener(this)
-        addFilterNotice = findViewById(R.id.add_filter_notice)
+        addFilterButton = findViewById(R.id.add_filter_button)
+        addFilterButton?.setOnClickListener { showNewFilterUI() }
         listView = findViewById(R.id.filter_list)
-        listView?.emptyView = findViewById(R.id.add_filter_notice)
         listAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, filterListItems)
         listView?.adapter = listAdapter
         listView?.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id -> showUpdateFilterUI(position) }
@@ -168,7 +169,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         playerView!!.addFullScreenListener(object: YouTubePlayerFullScreenListener {
             override fun onYouTubePlayerEnterFullScreen() {
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                fab.hide()
                 supportActionBar?.hide()
                 window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                 fullScreenHelper.enterFullScreen()
@@ -176,7 +176,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             override fun onYouTubePlayerExitFullScreen() {
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                fab.show()
                 supportActionBar?.show()
                 window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                 fullScreenHelper.exitFullScreen()
@@ -194,7 +193,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             var channelTitle = ""
 
             if (tracker.videoId == null) {
-                Snackbar.make(fab, "Search a Video to save as a Bookmark.", Snackbar.LENGTH_LONG).setAction("Action", null).show()
+                Snackbar.make(add_filter_button, "Search a Video to save as a Bookmark.", Snackbar.LENGTH_LONG).setAction("Action", null).show()
                 return
             } else {
                 videoId = tracker.videoId!!
@@ -333,7 +332,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun initializeWidgets() {
-        fab.setOnClickListener { showNewFilterUI() }
 
         val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
         drawer_layout.addDrawerListener(toggle)
