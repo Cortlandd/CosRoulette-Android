@@ -24,14 +24,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <Button
-                android:id="@+id/bookmark_button"
-                android:text="Bookmark Video"
-                android:gravity="end"
-                android:layout_below="@id/player_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
 
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_margin="10dp"
+            android:gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/bookmark_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/white_bookmark"
+                android:background="@drawable/bookmarks_button" />
         </RelativeLayout>
 
 

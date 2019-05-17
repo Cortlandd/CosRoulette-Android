@@ -31,6 +31,7 @@ class BookmarksFragment : DialogFragment() {
     var recyclerView: RecyclerView? = null
     var bookmarkAdapter: BookmarkAdapter? = null
     var mBookmarks: ArrayList<BookmarkModel> = ArrayList<BookmarkModel>()
+    var bookmarkListener: OnBookmarkInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,10 +43,10 @@ class BookmarksFragment : DialogFragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_bookmarks, container, false)
 
-        closeFab = view.findViewById(R.id.close_bookmarks_fab)
+        closeFab = view.findViewById<FloatingActionButton>(R.id.close_bookmarks_fab)
 
         // RecyclerView
-        recyclerView = view.findViewById(R.id.bookmark_recyclerview)
+        recyclerView = view.findViewById<RecyclerView>(R.id.bookmark_recyclerview)
         recyclerView?.layoutManager = LinearLayoutManager(this.activity)
 
         // Database handler to make queries to local SQLite DB
@@ -55,8 +56,9 @@ class BookmarksFragment : DialogFragment() {
         mBookmarks.addAll(dbHandler.allBookmarksList())
 
         // Adapter
-        bookmarkAdapter = BookmarkAdapter(this.activity!!, mBookmarks)
+        bookmarkAdapter = BookmarkAdapter(this.activity!!, mBookmarks, bookmarkListener!!)
         recyclerView?.adapter = bookmarkAdapter
+        bookmarkAdapter?.notifyDataSetChanged()
 
         closeFab!!.setOnClickListener {
             dismiss()
@@ -64,6 +66,22 @@ class BookmarksFragment : DialogFragment() {
 
         return view
 
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if (context is OnBookmarkInteractionListener) {
+            bookmarkListener = context
+        } else {
+            throw RuntimeException(context.toString() + "Must implement")
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        // TODO: Handle data in BookmarksFragment so it doesn't constantly query SQLITE
+        mBookmarks.clear()
+        bookmarkListener = null
     }
 
     override fun onStart() {
@@ -74,6 +92,10 @@ class BookmarksFragment : DialogFragment() {
             val height = ViewGroup.LayoutParams.MATCH_PARENT
             dialog.window?.setLayout(width, height)
         }
+    }
+
+    interface OnBookmarkInteractionListener {
+        fun GetVideoId(videoId: String)
     }
 
 

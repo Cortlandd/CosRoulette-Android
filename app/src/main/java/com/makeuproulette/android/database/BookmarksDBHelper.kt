@@ -46,6 +46,12 @@ class BookmarksDBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?
         return db.rawQuery("SELECT * FROM $TABLE_NAME", null)
     }
 
+    fun removeBookmark(videoId: String) {
+        val db = this.writableDatabase
+        return db.execSQL("DELETE FROM $TABLE_NAME WHERE $COLUMN_ID='$videoId'")
+    }
+
+    // TODO: Potentially implement this in shared preferences as opposed to running SQL Query
     fun allBookmarksList(): List<BookmarkModel> {
         val bookmarks: ArrayList<BookmarkModel> = ArrayList()
         val selectQuery = "SELECT * FROM $TABLE_NAME"
