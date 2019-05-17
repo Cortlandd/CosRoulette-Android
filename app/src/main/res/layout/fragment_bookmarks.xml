@@ -38,13 +38,30 @@
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
 
-        <!-- YOUR CUSTOM VIEWS HERE -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/bookmark_recyclerview"
+        <RelativeLayout
+            android:layout_margin="10dp"
+            android:layout_gravity="top"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
-        </androidx.recyclerview.widget.RecyclerView>
+            <TextView
+                android:id="@+id/bookmarks_help_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:textColor="@android:color/black"
+                android:text="Tap to Play, Swipe to remove" />
+
+            <!-- YOUR CUSTOM VIEWS HERE -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/bookmark_recyclerview"
+                android:layout_below="@+id/bookmarks_help_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </androidx.recyclerview.widget.RecyclerView>
+
+        </RelativeLayout>
 
     </FrameLayout>
 

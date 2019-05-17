@@ -29,15 +29,15 @@
 
         <RelativeLayout
             android:layout_margin="10dp"
-            android:gravity="center_horizontal"
+            android:gravity="end"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <ImageButton
                 android:id="@+id/bookmark_button"
+                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/white_bookmark"
                 android:background="@drawable/bookmarks_button" />
         </RelativeLayout>
 

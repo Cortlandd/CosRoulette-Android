@@ -14,15 +14,19 @@ class BookmarksDBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?
         private val DATABASE_NAME = "bookmarks.db"
         val TABLE_NAME = "bookmarks"
         val COLUMN_ID = "id"
+        val COLUMN_VIDEOID = "videoId"
         val COLUMN_TITLE = "title"
         val COLUMN_THUMBNAIL = "thumbnail"
+        val COLUMN_CHANNELTITLE = "channel_title"
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
         db?.execSQL("CREATE TABLE " + TABLE_NAME + "(" +
-            COLUMN_ID + " TEXT PRIMARY KEY, " +
+            COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            COLUMN_VIDEOID + " TEXT, " +
             COLUMN_TITLE + " TEXT, " +
-            COLUMN_THUMBNAIL + " TEXT" + ");"
+            COLUMN_THUMBNAIL + " TEXT, " +
+            COLUMN_CHANNELTITLE + " TEXT" + ");"
         )
     }
 
@@ -33,9 +37,10 @@ class BookmarksDBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?
 
     fun addBookmark(bookmarkModel: BookmarkModel) {
         val values = ContentValues()
-        values.put(COLUMN_ID, bookmarkModel.id)
+        values.put(COLUMN_VIDEOID, bookmarkModel.videoId)
         values.put(COLUMN_TITLE, bookmarkModel.title)
         values.put(COLUMN_THUMBNAIL, bookmarkModel.thumbnail)
+        values.put(COLUMN_CHANNELTITLE, bookmarkModel.channelTitle)
         val db = this.writableDatabase
         db.insert(TABLE_NAME, null, values)
         db.close()
@@ -48,7 +53,7 @@ class BookmarksDBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?
 
     fun removeBookmark(videoId: String) {
         val db = this.writableDatabase
-        return db.execSQL("DELETE FROM $TABLE_NAME WHERE $COLUMN_ID='$videoId'")
+        return db.execSQL("DELETE FROM $TABLE_NAME WHERE $COLUMN_VIDEOID='$videoId'")
     }
 
     // TODO: Potentially implement this in shared preferences as opposed to running SQL Query
@@ -61,9 +66,10 @@ class BookmarksDBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?
         if (cursor.moveToFirst()) {
             do {
                 var bookmark: BookmarkModel = BookmarkModel()
-                bookmark.id = cursor.getString(cursor.getColumnIndex(COLUMN_ID))
+                bookmark.videoId = cursor.getString(cursor.getColumnIndex(COLUMN_VIDEOID))
                 bookmark.title = cursor.getString(cursor.getColumnIndex(COLUMN_TITLE))
                 bookmark.thumbnail = cursor.getString(cursor.getColumnIndex(COLUMN_THUMBNAIL))
+                bookmark.channelTitle = cursor.getString(cursor.getColumnIndex(COLUMN_CHANNELTITLE))
                 bookmarks.add(bookmark)
             } while (cursor.moveToNext())
         }

@@ -10,7 +10,7 @@ data class YouTubeSearchResponse(val items: Array<Items>) {
     }
 
 
-    data class Items(val id: Id) {
+    data class Items(val id: Id, val snippet: Snippet) {
 
         class Deserializer: ResponseDeserializable<Items> {
             override fun deserialize(content: String): Items? = Gson().fromJson(content, Items::class.java)
@@ -22,6 +22,30 @@ data class YouTubeSearchResponse(val items: Array<Items>) {
 
         class Deserializer: ResponseDeserializable<Id> {
             override fun deserialize(content: String): Id? = Gson().fromJson(content, Id::class.java)
+        }
+
+    }
+
+    data class Snippet(var title: String, var thumbnails: Thumbnails, var channelTitle: String) {
+
+        class Deserializer: ResponseDeserializable<Snippet> {
+            override fun deserialize(content: String): Snippet? = Gson().fromJson(content, Snippet::class.java)
+        }
+
+    }
+
+    data class Thumbnails(var default: Default) {
+
+        class Deserializer: ResponseDeserializable<Thumbnails> {
+            override fun deserialize(content: String): Thumbnails? = Gson().fromJson(content, Thumbnails::class.java)
+        }
+
+    }
+
+    data class Default(var url: String) {
+
+        class Deserializer: ResponseDeserializable<Default> {
+            override fun deserialize(content: String): Default? = Gson().fromJson(content, Default::class.java)
         }
 
     }

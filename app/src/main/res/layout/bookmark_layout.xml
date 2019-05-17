@@ -17,6 +17,7 @@
         android:layout_height="match_parent">
 
         <ImageView
+            android:id="@+id/bookmark_thumbnail_image"
             android:src="@color/colorAccent"
             android:layout_margin="10dp"
             android:layout_width="100dp"
@@ -28,27 +29,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/bookmark_thumbnail"
-                android:hint="Thumbnail"
-                android:textColor="@android:color/black"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/bookmark_title"
                 android:hint="Title"
-                android:textSize="32sp"
+                android:textSize="24sp"
                 android:textColor="@android:color/black"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+
             <TextView
-                android:id="@+id/bookmark_videoid"
-                android:hint="VideoId"
+                android:id="@+id/bookmark_channel_title"
+                android:hint="Channel Title"
                 android:textColor="@android:color/black"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
 
         </LinearLayout>
 

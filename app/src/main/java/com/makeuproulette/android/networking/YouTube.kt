@@ -8,6 +8,7 @@ import com.github.kittinunf.result.Result
 import com.makeuproulette.android.data.YouTubeSearchResponse
 import com.makeuproulette.android.data.YouTubeVideoResponse
 import java.util.*
+import kotlin.collections.ArrayList
 
 class YouTube {
 
@@ -19,10 +20,11 @@ class YouTube {
 
         const val YOUTUBE_VIDEO_URL = "https://www.googleapis.com/youtube/v3/videos"
 
-        fun search_youtube(search_params: List<Pair<String, Any?>>): ArrayList<String> {
+        fun search_youtube(search_params: List<Pair<String, Any?>>): ArrayList<MutableMap<String, Any>> {
 
             // List of videos returned
-            var videosArray = ArrayList<String>()
+            var videosArray = arrayListOf(mutableMapOf<String, Any>())
+            var mVideosArray = mutableMapOf<String, Any>()
 
             // HTTP Request. Calling on NONE blocking mode in
             val (request, response, result) = Fuel.get(YOUTUBE_SEARCH_URL, search_params).responseObject<YouTubeSearchResponse>()
@@ -34,7 +36,13 @@ class YouTube {
                 is Result.Success -> {
                     println("Success ")
                     result.get().items.forEach {
-                        videosArray.add(it.id.videoId)
+                        mVideosArray = mutableMapOf(
+                                "videoId" to it.id.videoId,
+                                "title" to it.snippet.title,
+                                "thumbnail" to it.snippet.thumbnails.default.url,
+                                "channelTitle" to it.snippet.channelTitle
+                        )
+                        videosArray.addAll(listOf(mVideosArray))
                     }
                 }
                 is Result.Failure -> {

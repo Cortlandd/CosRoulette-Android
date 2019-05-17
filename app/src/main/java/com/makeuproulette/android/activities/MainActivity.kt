@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.WindowManager
 import android.widget.*
@@ -65,6 +66,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var tracker = YouTubePlayerTracker()
     var bookmarksFragment = BookmarksFragment()
     var fm: FragmentManager? = null
+    var searchResult = ArrayList<MutableMap<String, Any>>()
 
     override fun onDialogPositiveClick(dialog: androidx.fragment.app.DialogFragment, filter: String) {
 
@@ -72,6 +74,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             filterListItems.add(filter)
             listAdapter?.notifyDataSetChanged()
             youtubeArray.clear()
+            searchResult.clear()
             println("Cleared Youtube Array")
 
             // TODO: Decide if these are really necessary
@@ -144,8 +147,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {
                 super.onStateChange(youTubePlayer, state)
-                if (state == PlayerConstants.PlayerState.PLAYING) {
-                    bookmarkValidation()
+                when (state) {
+                    PlayerConstants.PlayerState.UNKNOWN -> {
+                        bookmarkButton?.visibility = GONE
+                    }
+                    PlayerConstants.PlayerState.UNSTARTED -> {
+                        bookmarkButton?.visibility = GONE
+                    }
+                    else -> {
+                        bookmarkValidation()
+                        bookmarkButton?.visibility = VISIBLE
+                    }
                 }
             }
         })
@@ -177,32 +189,45 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         if (v == bookmarkButton) {
 
             val videoId = tracker.videoId
+            var thumbnail = ""
+            var title = ""
+            var channelTitle = ""
 
-            when (tracker.state) {
-                PlayerConstants.PlayerState.UNSTARTED -> {
-                    return
-                }
-                PlayerConstants.PlayerState.UNKNOWN -> {
-                    return
-                }
-                else -> {
+            if (bookmarkButton!!.isSelected) {
+                val dbHandler = BookmarksDBHelper(this, null)
+                dbHandler.removeBookmark(videoId!!)
+                dbHandler.close()
+                bookmarkButton?.isSelected = false
+            } else {
 
-                    // This means that the video is already bookmarked
-                    if (bookmarkButton?.isSelected == true) {
-                        val dbHandler = BookmarksDBHelper(this, null)
-                        dbHandler.removeBookmark(videoId!!)
-                        dbHandler.close()
-                        bookmarkButton?.isSelected = false
-                    } else {
-                        val dbHandler = BookmarksDBHelper(this, null)
-                        val bookmark = BookmarkModel(videoId!!, "Test title", "Test URL")
-                        dbHandler.addBookmark(bookmark)
-                        dbHandler.close()
-                        bookmarkButton?.isSelected = true
+                searchResult.forEach {
+
+                    if (it.values.contains(videoId!!)) {
+
+                        it.forEach { (key, value) ->
+
+                            when (key) {
+                                "thumbnail" -> {
+                                    thumbnail = value.toString()
+                                }
+                                "title" -> {
+                                    title = value.toString()
+                                }
+                                "channelTitle" -> {
+                                    channelTitle = value.toString()
+                                }
+                            }
+
+                        }
                     }
-                }
-            }
 
+                }
+                val dbHandler = BookmarksDBHelper(this, null)
+                val bookmark = BookmarkModel(videoId!!, title, thumbnail, channelTitle)
+                dbHandler.addBookmark(bookmark)
+                dbHandler.close()
+                bookmarkButton?.isSelected = true
+            }
         }
 
         if (v == searchButton) {
@@ -225,7 +250,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 doAsyncResult {
                     val r = YouTube.search_youtube(searchParams)
                     uiThread {
-                        youtubeArray.addAll(r)
+                        //youtubeArray.addAll(r)
+                        searchResult.addAll(r)
+                        searchResult.forEach {
+                            it.forEach { (key, value) ->
+                                if (key == "videoId") {
+                                    youtubeArray.add(value.toString())
+                                }
+                            }
+                        }
+
                         val randomVid: String = youtubeArray[Random().nextInt(youtubeArray.size)]
                         initializedYouTubePlayer!!.loadVideo(randomVid, 0f)
                         System.out.println("Playing Video: $randomVid")
@@ -264,7 +298,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun initializeBookmarksButton() {
 
         bookmarkButton = findViewById(R.id.bookmark_button)
-        bookmarkButton?.setOnClickListener(this)
+        bookmarkButton!!.setOnClickListener(this)
 
     }
 
@@ -283,7 +317,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             allBookmarks.forEach {
                 // Bookmark is selected state based on if current video is in table
                 //bookmarkButton?.isSelected = it.id == currentVideo
-                if (it.id == currentVideo) {
+                if (it.videoId == currentVideo) {
                     bookmarkButton?.isSelected = true
                     return
                 }
@@ -322,6 +356,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        bookmarkValidation()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         val inflater = menuInflater
@@ -342,10 +381,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-//        when (item.itemId) {
-//            R.id.action_settings -> return true
-//            else -> return super.onOptionsItemSelected(item)
-//        }
 
         if (-1 != selectedItem) {
             if (R.id.edit_item == item.itemId) {
@@ -393,39 +428,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      * Do once a Bookmark is clicked/tapped.
      */
     override fun GetVideoId(videoId: String) {
-
-        // Create Alert Dialog for bookmarks
-        var options = listOf("Play Video", "Remove Video")
-        var adapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_item, options)
-        var builder: AlertDialog.Builder = AlertDialog.Builder(this)
-        builder.setTitle("Choose")
-        builder.setAdapter(adapter, object : DialogInterface.OnClickListener {
-            override fun onClick(dialog: DialogInterface?, which: Int) {
-                when (options.get(which)) {
-                    "Play Video" -> {
-                        playBookmark(videoId)
-                    }
-                    "Remove Video" -> {
-                        removeBookmark(videoId, which)
-                    }
-                }
-            }
-
-        }).create().show()
-
-        println(videoId)
-    }
-
-    fun removeBookmark(videoId: String, position: Int) {
-        val dbHelper = BookmarksDBHelper(this, null)
-        dbHelper.removeBookmark(videoId)
-        bookmarksFragment.bookmarkAdapter?.notifyItemRemoved(position)
-        bookmarksFragment.bookmarkAdapter?.notifyDataSetChanged()
+        playBookmark(videoId)
     }
 
     fun playBookmark(videoId: String) {
         initializedYouTubePlayer!!.loadOrCueVideo(lifecycle, videoId, 0f)
+        bookmarkValidation()
         bookmarksFragment.dismiss()
+
     }
 
 }

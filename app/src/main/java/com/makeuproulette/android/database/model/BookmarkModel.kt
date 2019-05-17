@@ -2,14 +2,16 @@ package com.makeuproulette.android.database.model
 
 class BookmarkModel {
 
-    var id: String? = null
+    var videoId: String? = null
     var title: String? = null
     var thumbnail: String? = null
+    var channelTitle: String? = null
 
-    constructor(id: String, title: String, thumbnail: String) {
-        this.id = id
+    constructor(videoId: String, title: String, thumbnail: String, channelTitle: String) {
+        this.videoId = videoId
         this.title = title
         this.thumbnail = thumbnail
+        this.channelTitle = channelTitle
     }
 
     constructor()

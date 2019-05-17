@@ -1,17 +1,23 @@
 package com.makeuproulette.android.adapters
 
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.makeuproulette.android.R
+import com.makeuproulette.android.database.BookmarksDBHelper
 import com.makeuproulette.android.database.model.BookmarkModel
 import com.makeuproulette.android.fragments.BookmarksFragment
 
 import com.makeuproulette.android.fragments.BookmarksFragment.OnBookmarkInteractionListener
 import kotlinx.android.synthetic.main.bookmark_layout.view.*
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
+import java.net.URL
 
 class BookmarkAdapter(val context: Context, val mBookmarks: List<BookmarkModel>, val bookmarkListner: OnBookmarkInteractionListener): RecyclerView.Adapter<BookmarkAdapter.ViewHolder>() {
 
@@ -20,7 +26,7 @@ class BookmarkAdapter(val context: Context, val mBookmarks: List<BookmarkModel>,
     init {
         mOnClickListener = View.OnClickListener {v ->
             val bookmark = v.tag as BookmarkModel
-            bookmarkListner.GetVideoId(bookmark.id!!)
+            bookmarkListner.GetVideoId(bookmark.videoId!!)
         }
     }
 
@@ -37,9 +43,27 @@ class BookmarkAdapter(val context: Context, val mBookmarks: List<BookmarkModel>,
 
         var bookmark: BookmarkModel = mBookmarks[position]
 
-        holder.mVideoIdView.text = bookmark.id
         holder.mTitleView.text = bookmark.title
-        holder.mThumbnailView.text = bookmark.thumbnail
+        holder.mChannelTitleView.text = bookmark.channelTitle
+
+        val dbHandler = BookmarksDBHelper(context, null)
+        val cursor = dbHandler.getAllVideoIds()
+        if (!cursor!!.moveToPosition(position)) {
+            return
+        }
+        holder.itemView.id = cursor.getInt(cursor.getColumnIndex(BookmarksDBHelper.COLUMN_ID))
+        cursor.close()
+
+
+        doAsync {
+            var url = URL(bookmark.thumbnail.toString())
+            var bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream())
+
+            uiThread {
+                holder.mThumbnailImage.setImageBitmap(bitmap)
+            }
+
+        }
 
         with(holder.mView) {
             tag = bookmark
@@ -47,10 +71,14 @@ class BookmarkAdapter(val context: Context, val mBookmarks: List<BookmarkModel>,
         }
     }
 
+    fun refreshRecyclerview() {
+        notifyDataSetChanged()
+    }
+
     inner class ViewHolder(val mView: View): RecyclerView.ViewHolder(mView) {
-        val mVideoIdView: TextView = mView.findViewById(R.id.bookmark_videoid)
         val mTitleView: TextView = mView.findViewById(R.id.bookmark_title)
-        val mThumbnailView: TextView = mView.findViewById(R.id.bookmark_thumbnail)
+        val mChannelTitleView: TextView = mView.findViewById(R.id.bookmark_channel_title)
+        val mThumbnailImage: ImageView = mView.findViewById(R.id.bookmark_thumbnail_image)
 
     }
 }

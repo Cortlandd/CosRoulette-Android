@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -54,15 +55,34 @@ class BookmarksFragment : DialogFragment() {
 
         // Get all data from local SQLite DB and append to mBookmarks
         mBookmarks.addAll(dbHandler.allBookmarksList())
+        dbHandler.close()
 
         // Adapter
         bookmarkAdapter = BookmarkAdapter(this.activity!!, mBookmarks, bookmarkListener!!)
         recyclerView?.adapter = bookmarkAdapter
         bookmarkAdapter?.notifyDataSetChanged()
 
+        val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+
+            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                mBookmarks.removeAt(position)
+                recyclerView!!.adapter?.notifyItemRemoved(position)
+                removeBookmarkItem(viewHolder.itemView.id)
+            }
+        }
+
+        val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
+
         closeFab!!.setOnClickListener {
             dismiss()
         }
+
 
         return view
 
@@ -92,6 +112,16 @@ class BookmarksFragment : DialogFragment() {
             val height = ViewGroup.LayoutParams.MATCH_PARENT
             dialog.window?.setLayout(width, height)
         }
+    }
+
+    /**
+     * Used to remove swiped Bookmarks
+     */
+    fun removeBookmarkItem(id: Int) {
+        val dbHelper = BookmarksDBHelper(context!!, null)
+        var db = dbHelper.writableDatabase
+        db.delete(BookmarksDBHelper.TABLE_NAME, BookmarksDBHelper.COLUMN_ID + "=" + id, null)
+        db.close()
     }
 
     interface OnBookmarkInteractionListener {
