@@ -18,6 +18,7 @@ import android.view.View.VISIBLE
 import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.snackbar.Snackbar
 import com.makeuproulette.android.utils.FullScreenHelper
@@ -115,10 +116,35 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         listView = findViewById(R.id.filter_list)
         listAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, filterListItems)
         listView?.adapter = listAdapter
-        listView?.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id -> showUpdateFilterUI(position) }
+        //listView?.setOnItemClickListener { parent, view, position, id -> }
+        listView?.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+
+            // Create Alert Dialog for modifying filters
+            val options = listOf("Edit Filter", "Remove Filter")
+            val adapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_item, options)
+            val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+            builder.setTitle("Choose")
+            builder.setAdapter(adapter) { dialog, which ->
+                when (options.get(which)) {
+                    "Edit Filter" -> {
+                        val updateFragment = NewFilterDialogFragment.newInstance(R.string.update_filter_dialog_title, filterListItems[position])
+                        updateFragment.show(supportFragmentManager, "updatefilter")
+                    }
+                    "Remove Filter" -> {
+                        filterListItems.removeAt(position)
+                        listAdapter?.notifyDataSetChanged()
+                        youtubeArray.clear()
+                        println("Cleared Youtube Array")
+                        selectedItem = -1
+                    }
+                }
+            }.create().show()
+
+        }
 
         // Add "tutorials" to filter list by default
-        //filterListItems.add("tutorial")
+        filterListItems.add("tutorial")
+        listAdapter?.notifyDataSetChanged()
 
     }
 
@@ -343,12 +369,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun showNewFilterUI() {
         val newFragment = NewFilterDialogFragment.newInstance(R.string.add_new_filter_dialog_title, null)
         newFragment.show(supportFragmentManager, "newfilter")
-    }
-
-    fun showUpdateFilterUI(selected: Int) {
-        selectedItem = selected
-        showMenuItems = true
-        invalidateOptionsMenu()
     }
 
     override fun onBackPressed() {
