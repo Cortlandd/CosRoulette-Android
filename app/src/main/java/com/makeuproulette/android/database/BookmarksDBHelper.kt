@@ -21,7 +21,7 @@ class BookmarksDBHelper(context: Context, factory: SQLiteDatabase.CursorFactory?
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-        db?.execSQL("CREATE TABLE " + TABLE_NAME + "(" +
+        db?.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + "(" +
             COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
             COLUMN_VIDEOID + " TEXT, " +
             COLUMN_TITLE + " TEXT, " +
