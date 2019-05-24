@@ -4,6 +4,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.ColorStateList
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import com.google.android.material.navigation.NavigationView
 import androidx.core.view.GravityCompat
@@ -21,6 +22,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.snackbar.Snackbar
+import com.lukedeighton.wheelview.WheelView
+import com.lukedeighton.wheelview.adapter.WheelAdapter
 import com.makeuproulette.android.utils.FullScreenHelper
 import com.makeuproulette.android.fragments.NewFilterDialogFragment
 import com.makeuproulette.android.R
@@ -69,6 +72,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     var bookmarksFragment = BookmarksFragment()
     var fm: FragmentManager? = null
     var searchResult = ArrayList<MutableMap<String, Any>>()
+    private var wheelView: WheelView? = null
 
     override fun onDialogPositiveClick(dialog: androidx.fragment.app.DialogFragment, filter: String) {
 
@@ -140,6 +144,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }.create().show()
 
+            wheelView = findViewById(R.id.wheelview)
+            wheelView?.adapter = object : WheelAdapter {
+
+                override fun getDrawable(position: Int): Drawable? {
+                    return null
+                }
+
+                override fun getCount(): Int {
+                    return 6
+                }
+            }
+
         }
 
         // Add "tutorials" to filter list by default
@@ -169,7 +185,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 initializedYouTubePlayer = youTubePlayer
                 initializedYouTubePlayer!!.addListener(tracker)
                 addFullScreenListener()
-                searchButton?.visibility = VISIBLE
+                //searchButton?.visibility = VISIBLE
             }
 
             override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {

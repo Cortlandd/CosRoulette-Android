@@ -68,9 +68,23 @@
             android:id="@+id/search_button"
             android:visibility="gone"
             android:text="Search"
-            android:layout_gravity="bottom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
+        <com.lukedeighton.wheelview.WheelView
+            android:id="@+id/wheelview"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            app:repeatItems="true"
+            app:rotatableWheelDrawable="true"
+            app:selectionAngle="90.0"
+            app:wheelPosition="bottom"
+            app:wheelDrawable="@drawable/cylinder"
+            app:wheelItemCount="6"
+            app:wheelItemRadius="60dp"
+            app:wheelPadding="13dp"
+            app:wheelRadius="200dp" />
+
 
     </LinearLayout>
 

@@ -47,4 +47,7 @@ dependencies {
 
     // Anko Kotlin Library
     implementation "org.jetbrains.anko:anko:0.10.5"
+
+    // Wheel Implementation
+    implementation 'com.github.lukedeighton:wheelview:0.4.2'
 }
