@@ -137,8 +137,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     "Remove Filter" -> {
                         filterListItems.removeAt(position)
                         listAdapter?.notifyDataSetChanged()
-                        youtubeArray.clear()
-                        println("Cleared Youtube Array")
                         selectedItem = -1
                     }
                 }
