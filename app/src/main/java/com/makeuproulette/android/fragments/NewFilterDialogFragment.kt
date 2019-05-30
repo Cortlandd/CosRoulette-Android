@@ -9,11 +9,11 @@ import androidx.appcompat.app.AlertDialog
 import android.widget.EditText
 import com.makeuproulette.android.R
 
-class NewFilterDialogFragment: androidx.fragment.app.DialogFragment() {
+class NewFilterDialogFragment: DialogFragment() {
 
     interface NewFilterDialogListener {
-        fun onDialogPositiveClick(dialog: androidx.fragment.app.DialogFragment, filter: String)
-        fun onDialogNegativeClick(dialog: androidx.fragment.app.DialogFragment)
+        fun onDialogPositiveClick(dialog: DialogFragment, filter: String)
+        fun onDialogNegativeClick(dialog: DialogFragment)
     }
 
     var newFilterDialogListener: NewFilterDialogListener? = null

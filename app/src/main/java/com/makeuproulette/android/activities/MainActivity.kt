@@ -5,18 +5,18 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
+import android.media.MediaPlayer
 import android.os.Bundle
 import com.google.android.material.navigation.NavigationView
 import androidx.core.view.GravityCompat
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.view.WindowManager
+import android.view.animation.Animation
+import android.view.animation.RotateAnimation
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
@@ -41,7 +41,9 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTube
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.doAsyncResult
+import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
 import java.util.*
 import kotlin.collections.ArrayList
@@ -73,8 +75,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     var fm: FragmentManager? = null
     var searchResult = ArrayList<MutableMap<String, Any>>()
     private var wheelView: WheelView? = null
+    private var revolverSpin: MediaPlayer? = null
+    private var revolverFullSpin: MediaPlayer? = null
 
-    override fun onDialogPositiveClick(dialog: androidx.fragment.app.DialogFragment, filter: String) {
+    override fun onDialogPositiveClick(dialog: DialogFragment, filter: String) {
 
         if ("newfilter" == dialog.tag) {
             filterListItems.add(filter)
@@ -96,9 +100,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             //Snackbar.make(fab, "Filter Updated", Snackbar.LENGTH_LONG).setAction("Action", null).show()
         }
 
+
     }
 
-    override fun onDialogNegativeClick(dialog: androidx.fragment.app.DialogFragment) {
+    override fun onDialogNegativeClick(dialog: DialogFragment) {
         // TODO: Decide if these are really necessary
         //Snackbar.make(fab, "Cancelled", Snackbar.LENGTH_LONG).setAction("Action", null).show()
     }
@@ -113,6 +118,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         initializeBookmarksButton()
 
         fm = supportFragmentManager
+        revolverSpin = MediaPlayer.create(applicationContext, R.raw.revolver_spin2)
+        revolverFullSpin = MediaPlayer.create(applicationContext, R.raw.revolver_full_spin)
         searchButton = findViewById(R.id.search_button)
         searchButton?.setOnClickListener(this)
         addFilterButton = findViewById(R.id.add_filter_button)
@@ -132,6 +139,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 when (options.get(which)) {
                     "Edit Filter" -> {
                         val updateFragment = NewFilterDialogFragment.newInstance(R.string.update_filter_dialog_title, filterListItems[position])
+                        selectedItem = position
                         updateFragment.show(supportFragmentManager, "updatefilter")
                     }
                     "Remove Filter" -> {
@@ -142,23 +150,37 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }.create().show()
 
-            wheelView = findViewById(R.id.wheelview)
-            wheelView?.adapter = object : WheelAdapter {
-
-                override fun getDrawable(position: Int): Drawable? {
-                    return null
-                }
-
-                override fun getCount(): Int {
-                    return 6
-                }
-            }
-
         }
 
         // Add "tutorials" to filter list by default
         filterListItems.add("tutorial")
         listAdapter?.notifyDataSetChanged()
+
+        wheelView = findViewById(R.id.wheelview)
+        wheelView?.isClickable = false
+        wheelView?.adapter = object : WheelAdapter {
+
+            override fun getDrawable(position: Int): Drawable? {
+                return null
+            }
+
+            override fun getCount(): Int {
+                return 6
+            }
+        }
+
+        wheelView?.setOnWheelItemSelectedListener(object: WheelView.OnWheelItemSelectListener {
+
+            override fun onWheelItemSelected(parent: WheelView?, itemDrawable: Drawable?, position: Int) {
+                revolverSpin?.start()
+            }
+
+        })
+
+        wheelView?.onWheelItemClickListener = WheelView.OnWheelItemClickListener { parent, position, isSelected ->
+            rotate()
+            System.out.println("Clicked")
+        }
 
     }
 
@@ -171,6 +193,42 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
+    /**
+     * Roate the wheel image in 360 * 12 degree around the center of the wheel image in 3 seconds
+     */
+    fun rotate() {
+        val mAngleToRotate = 360f * 12 // rotate 12 rounds
+        val wheelRotation: RotateAnimation = RotateAnimation(
+                // From degrees
+                wheelView!!.angle,
+                // To degrees
+                mAngleToRotate,
+                // pivotX
+                wheelView!!.wheelDrawable.bounds.centerX().toFloat(),
+                // pivotY
+                wheelView!!.wheelDrawable.bounds.centerY().toFloat()
+        )
+        wheelRotation.setDuration(1000) // rotate 12 rounds in 3 seconds
+        wheelRotation.setInterpolator(this, android.R.interpolator.accelerate_decelerate)
+        wheelView?.startAnimation(wheelRotation)
+
+        wheelRotation.setAnimationListener(object: Animation.AnimationListener {
+
+            override fun onAnimationStart(animation: Animation?) {
+                revolverFullSpin?.start()
+            }
+
+            override fun onAnimationRepeat(animation: Animation?) {
+
+            }
+
+            override fun onAnimationEnd(animation: Animation?) {
+                searchVideo()
+            }
+        })
+
+    }
+
     private fun initYoutubePlayerView() {
 
         playerView = findViewById(R.id.player_view)
@@ -179,10 +237,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         playerView?.addYouTubePlayerListener(object: AbstractYouTubePlayerListener() {
             override fun onReady(youTubePlayer: YouTubePlayer) {
                 super.onReady(youTubePlayer)
-                youTubePlayer.loadOrCueVideo(lifecycle, "", 0f)
                 initializedYouTubePlayer = youTubePlayer
                 initializedYouTubePlayer!!.addListener(tracker)
                 addFullScreenListener()
+                wheelView?.isClickable = true
+                toast("Ready To Spin")
                 //searchButton?.visibility = VISIBLE
             }
 
@@ -276,69 +335,70 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
 
-        if (v == searchButton) {
+    }
 
-            bookmarkButton?.isSelected = false
+    private fun searchVideo() {
 
-            allFiltersStringText = filterListItems.joinToString(" ")
-            Log.i("R allFiltersStringText", allFiltersStringText)
+        bookmarkButton?.isSelected = false
 
-            var searchParams = listOf(
-                    "q" to "makeup tutorials $allFiltersStringText",
-                    "part" to "id, snippet",
-                    "key" to YouTube.API_KEY,
-                    "safeSearch" to "none",
-                    "type" to "video"
-            )
+        allFiltersStringText = filterListItems.joinToString(" ")
+        Log.i("R allFiltersStringText", allFiltersStringText)
 
-            if (youtubeArray.isEmpty()) {
+        var searchParams = listOf(
+                "q" to "makeup tutorials $allFiltersStringText",
+                "part" to "id, snippet",
+                "key" to YouTube.API_KEY,
+                "safeSearch" to "none",
+                "type" to "video"
+        )
 
-                doAsyncResult {
-                    val r = YouTube.search_youtube(searchParams)
-                    uiThread {
-                        //youtubeArray.addAll(r)
-                        searchResult.addAll(r)
-                        searchResult.forEach {
-                            it.forEach { (key, value) ->
-                                if (key == "videoId") {
-                                    youtubeArray.add(value.toString())
-                                }
+        if (youtubeArray.isEmpty()) {
+
+            doAsyncResult {
+                val r = YouTube.search_youtube(searchParams)
+                uiThread {
+                    //youtubeArray.addAll(r)
+                    searchResult.addAll(r)
+                    searchResult.forEach {
+                        it.forEach { (key, value) ->
+                            if (key == "videoId") {
+                                youtubeArray.add(value.toString())
                             }
                         }
-
-                        val randomVid: String = youtubeArray[Random().nextInt(youtubeArray.size)]
-                        initializedYouTubePlayer!!.loadVideo(randomVid, 0f)
-                        System.out.println("Playing Video: $randomVid")
-                        // Get random element position
-                        val randomVidIndex = youtubeArray.indexOf(randomVid)
-                        // Remove random element from list
-                        youtubeArray.removeAt(randomVidIndex)
-                        System.out.println(youtubeArray.toString())
                     }
+
+                    val randomVid: String = youtubeArray[Random().nextInt(youtubeArray.size)]
+                    initializedYouTubePlayer!!.loadVideo(randomVid, 0f)
+                    System.out.println("Playing Video: $randomVid")
+                    // Get random element position
+                    val randomVidIndex = youtubeArray.indexOf(randomVid)
+                    // Remove random element from list
+                    youtubeArray.removeAt(randomVidIndex)
+                    System.out.println(youtubeArray.toString())
                 }
-
-            }
-            if (!youtubeArray.isEmpty()) {
-
-                // Get random string videoId from youtube array
-                val randomVid: String = youtubeArray[Random().nextInt(youtubeArray.size)]
-
-                // Play video with random array
-                initializedYouTubePlayer!!.loadVideo(randomVid, 0f)
-                System.out.println("Playing Video: " + randomVid)
-
-                // Get random element position
-                val randomVidIndex = youtubeArray.indexOf(randomVid)
-
-                // Remove random element from list
-                youtubeArray.removeAt(randomVidIndex)
-
-                // Print remaining videos
-                System.out.println(youtubeArray.toString())
-
             }
 
         }
+        if (!youtubeArray.isEmpty()) {
+
+            // Get random string videoId from youtube array
+            val randomVid: String = youtubeArray[Random().nextInt(youtubeArray.size)]
+
+            // Play video with random array
+            initializedYouTubePlayer!!.loadVideo(randomVid, 0f)
+            System.out.println("Playing Video: " + randomVid)
+
+            // Get random element position
+            val randomVidIndex = youtubeArray.indexOf(randomVid)
+
+            // Remove random element from list
+            youtubeArray.removeAt(randomVidIndex)
+
+            // Print remaining videos
+            System.out.println(youtubeArray.toString())
+
+        }
+
     }
 
     private fun initializeBookmarksButton() {
@@ -398,45 +458,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onResume() {
         super.onResume()
         bookmarkValidation()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        val inflater = menuInflater
-        inflater.inflate(R.menu.main, menu)
-        val editItem = menu.findItem(R.id.edit_item)
-        val deleteItem = menu.findItem(R.id.delete_item)
-
-        if (showMenuItems) {
-            editItem.isVisible = true
-            deleteItem.isVisible = true
-        }
-
-        return true
-
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-
-        if (-1 != selectedItem) {
-            if (R.id.edit_item == item.itemId) {
-                val updateFragment = NewFilterDialogFragment.newInstance(R.string.update_filter_dialog_title, filterListItems[selectedItem])
-                updateFragment.show(supportFragmentManager, "updatefilter")
-            } else if (R.id.delete_item == item.itemId) {
-                filterListItems.removeAt(selectedItem)
-                listAdapter?.notifyDataSetChanged()
-                youtubeArray.clear()
-                println("Cleared Youtube Array")
-                selectedItem = -1
-                // TODO: Decide if these are really necessary
-                //Snackbar.make(fab, "Filter removed", Snackbar.LENGTH_LONG).setAction("Action", null).show()
-            }
-        }
-        return super.onOptionsItemSelected(item)
-
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
