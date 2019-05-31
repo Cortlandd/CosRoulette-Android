@@ -65,16 +65,32 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
+                <TextView
+                    android:text="Under Construction"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:textSize="32dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:text="Will be available in upcoming updates..."
+                    android:textStyle="italic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
                 <EditText
                     android:id="@+id/submit_content_url"
+                    android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:hint="i.e. https://www.youtube.com/watch?v=hAyxEMo5JVE"
+                    android:hint="https://www.youtube.com/watch?v=hAyxEMo5JVE"
                     android:textSize="16dp" />
 
                 <Button
                     android:id="@+id/submit_content_submit_button"
+                    android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Submit" />
