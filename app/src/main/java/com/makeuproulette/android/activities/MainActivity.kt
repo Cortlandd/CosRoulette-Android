@@ -481,7 +481,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
 
-        drawer_layout.closeDrawer(GravityCompat.START)
+        // Method to close drawer once a Navigation item is clicked
+        //drawer_layout.closeDrawer(GravityCompat.START)
         return true
     }
 
