@@ -1,9 +1,7 @@
 package com.makeuproulette.android.activities
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -41,7 +39,6 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTube
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.doAsyncResult
 import org.jetbrains.anko.toast
 import org.jetbrains.anko.uiThread
@@ -466,6 +463,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.nav_bookmarks -> {
                 fm?.beginTransaction()
                 bookmarksFragment.show(fm, "BOOKMARKS_TAG")
+            }
+            R.id.nav_submit_content -> {
+                val i: Intent = Intent(this, SubmitContentActivity::class.java)
+                startActivity(i)
             }
             R.id.nav_contact -> {
                 val i: Intent = Intent(this, ContactActivity::class.java)

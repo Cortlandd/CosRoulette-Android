@@ -8,6 +8,11 @@
             android:id="@+id/nav_bookmarks"
             android:icon="@android:drawable/ic_input_get"
             android:title="Bookmarks" />
+
+        <item
+            android:id="@+id/nav_submit_content"
+            android:icon="@android:drawable/ic_menu_edit"
+            android:title="You a Content Creator?"/>
     </group>
 
     <item android:title="Information">
