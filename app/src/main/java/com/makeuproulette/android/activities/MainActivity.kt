@@ -4,6 +4,8 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.drawable.Drawable
 import android.media.MediaPlayer
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import com.google.android.material.navigation.NavigationView
 import androidx.core.view.GravityCompat
@@ -22,6 +24,7 @@ import androidx.fragment.app.FragmentManager
 import com.google.android.material.snackbar.Snackbar
 import com.lukedeighton.wheelview.WheelView
 import com.lukedeighton.wheelview.adapter.WheelAdapter
+import com.makeuproulette.android.BuildConfig
 import com.makeuproulette.android.utils.FullScreenHelper
 import com.makeuproulette.android.fragments.NewFilterDialogFragment
 import com.makeuproulette.android.R
@@ -468,11 +471,29 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val i: Intent = Intent(this, SubmitContentActivity::class.java)
                 startActivity(i)
             }
-            R.id.nav_contact -> {
-                val i: Intent = Intent(this, ContactActivity::class.java)
+            R.id.nav_instagram -> {
+                var url: Uri = Uri.parse("https://instagram.com/makeup_roulette")
+                var i: Intent = Intent(Intent.ACTION_VIEW, url)
                 startActivity(i)
             }
-            R.id.nav_help -> {
+            R.id.nav_sendemail -> {
+                val deviceModel = Build.MODEL
+                val appVersion = BuildConfig.VERSION_NAME
+                val body =
+                    """
+                        -------------------- <br/>
+                        Device: $deviceModel <br/>
+                        App Version: $appVersion
+                    """.trimIndent()
+
+                val emailIntent = Intent(Intent.ACTION_SENDTO)
+                emailIntent.type = "message/rfc822"
+                emailIntent.data = Uri.parse("mailto:cortland12@icloud.com")
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Support - Makeup Roulette")
+                emailIntent.putExtra(Intent.EXTRA_TEXT, body)
+                startActivity(Intent.createChooser(emailIntent, "Send feedback"))
+            }
+            R.id.nav_about -> {
                 val i: Intent = Intent(this, AboutActivity::class.java)
                 startActivity(i)
             }
