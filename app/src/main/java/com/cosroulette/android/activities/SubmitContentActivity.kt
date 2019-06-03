@@ -1,8 +1,8 @@
-package com.makeuproulette.android.activities
+package com.cosroulette.android.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.makeuproulette.android.R
+import com.cosroulette.android.R
 import kotlinx.android.synthetic.main.activity_submit_content.*
 import android.content.DialogInterface
 import androidx.appcompat.app.AlertDialog

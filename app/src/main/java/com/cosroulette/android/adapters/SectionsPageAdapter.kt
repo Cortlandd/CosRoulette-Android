@@ -1,4 +1,4 @@
-package com.makeuproulette.android.adapters
+package com.cosroulette.android.adapters
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager

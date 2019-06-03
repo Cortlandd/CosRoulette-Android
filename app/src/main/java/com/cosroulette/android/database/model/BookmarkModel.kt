@@ -1,4 +1,4 @@
-package com.makeuproulette.android.database.model
+package com.cosroulette.android.database.model
 
 class BookmarkModel {
 

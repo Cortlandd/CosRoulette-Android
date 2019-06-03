@@ -1,13 +1,13 @@
-package com.makeuproulette.android.activities
+package com.cosroulette.android.activities
 
 import android.os.Bundle
 import com.google.android.material.tabs.TabLayout
 import androidx.viewpager.widget.ViewPager
 import androidx.appcompat.app.AppCompatActivity
-import com.makeuproulette.android.fragments.FAQFragment
-import com.makeuproulette.android.fragments.LicensesFragment
-import com.makeuproulette.android.R
-import com.makeuproulette.android.adapters.SectionsPageAdapter
+import com.cosroulette.android.fragments.FAQFragment
+import com.cosroulette.android.fragments.LicensesFragment
+import com.cosroulette.android.R
+import com.cosroulette.android.adapters.SectionsPageAdapter
 import kotlinx.android.synthetic.main.activity_about.*
 
 class AboutActivity : AppCompatActivity() {

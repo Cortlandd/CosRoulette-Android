@@ -40,7 +40,7 @@
         </menu>
     </item>
 
-    <item android:title="Enjoy Makeup Roulette?">
+    <item android:title="Enjoy Cos Roulette?">
         <menu>
             <item
                 android:id="@+id/nav_rate_app"

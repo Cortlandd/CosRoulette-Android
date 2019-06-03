@@ -1,4 +1,4 @@
-package com.makeuproulette.android.fragments
+package com.cosroulette.android.fragments
 
 
 import android.app.Dialog
@@ -7,7 +7,7 @@ import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.appcompat.app.AlertDialog
 import android.widget.EditText
-import com.makeuproulette.android.R
+import com.cosroulette.android.R
 
 class NewFilterDialogFragment: DialogFragment() {
 

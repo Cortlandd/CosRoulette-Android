@@ -1,4 +1,4 @@
-package com.makeuproulette.android.utils;
+package com.cosroulette.android.utils;
 
 import android.app.Activity;
 import android.view.View;

@@ -1,4 +1,4 @@
-package com.makeuproulette.android.activities
+package com.cosroulette.android.activities
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -24,14 +24,14 @@ import androidx.fragment.app.FragmentManager
 import com.google.android.material.snackbar.Snackbar
 import com.lukedeighton.wheelview.WheelView
 import com.lukedeighton.wheelview.adapter.WheelAdapter
-import com.makeuproulette.android.BuildConfig
-import com.makeuproulette.android.utils.FullScreenHelper
-import com.makeuproulette.android.fragments.NewFilterDialogFragment
-import com.makeuproulette.android.R
-import com.makeuproulette.android.database.BookmarksDBHelper
-import com.makeuproulette.android.database.model.BookmarkModel
-import com.makeuproulette.android.fragments.BookmarksFragment
-import com.makeuproulette.android.networking.YouTube
+import com.cosroulette.android.BuildConfig
+import com.cosroulette.android.utils.FullScreenHelper
+import com.cosroulette.android.fragments.NewFilterDialogFragment
+import com.cosroulette.android.R
+import com.cosroulette.android.database.BookmarksDBHelper
+import com.cosroulette.android.database.model.BookmarkModel
+import com.cosroulette.android.fragments.BookmarksFragment
+import com.cosroulette.android.networking.YouTube
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
@@ -472,7 +472,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 startActivity(i)
             }
             R.id.nav_instagram -> {
-                var url: Uri = Uri.parse("https://instagram.com/makeup_roulette")
+                var url: Uri = Uri.parse("https://instagram.com/cosroulette")
                 var i: Intent = Intent(Intent.ACTION_VIEW, url)
                 startActivity(i)
             }
@@ -489,7 +489,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val emailIntent = Intent(Intent.ACTION_SENDTO)
                 emailIntent.type = "message/rfc822"
                 emailIntent.data = Uri.parse("mailto:cortland12@icloud.com")
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Support - Makeup Roulette")
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Support - Cos Roulette")
                 emailIntent.putExtra(Intent.EXTRA_TEXT, body)
                 startActivity(Intent.createChooser(emailIntent, "Send feedback"))
             }

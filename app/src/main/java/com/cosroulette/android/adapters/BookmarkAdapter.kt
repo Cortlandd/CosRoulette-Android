@@ -1,4 +1,4 @@
-package com.makeuproulette.android.adapters
+package com.cosroulette.android.adapters
 
 import android.content.Context
 import android.graphics.BitmapFactory
@@ -8,12 +8,12 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.makeuproulette.android.R
-import com.makeuproulette.android.database.BookmarksDBHelper
-import com.makeuproulette.android.database.model.BookmarkModel
-import com.makeuproulette.android.fragments.BookmarksFragment
+import com.cosroulette.android.R
+import com.cosroulette.android.database.BookmarksDBHelper
+import com.cosroulette.android.database.model.BookmarkModel
+import com.cosroulette.android.fragments.BookmarksFragment
 
-import com.makeuproulette.android.fragments.BookmarksFragment.OnBookmarkInteractionListener
+import com.cosroulette.android.fragments.BookmarksFragment.OnBookmarkInteractionListener
 import kotlinx.android.synthetic.main.bookmark_layout.view.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread

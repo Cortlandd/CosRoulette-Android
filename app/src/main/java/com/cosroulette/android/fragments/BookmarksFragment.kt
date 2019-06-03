@@ -1,4 +1,4 @@
-package com.makeuproulette.android.fragments
+package com.cosroulette.android.fragments
 
 
 import android.content.Context
@@ -14,11 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-import com.makeuproulette.android.R
-import com.makeuproulette.android.activities.MainActivity
-import com.makeuproulette.android.adapters.BookmarkAdapter
-import com.makeuproulette.android.database.BookmarksDBHelper
-import com.makeuproulette.android.database.model.BookmarkModel
+import com.cosroulette.android.R
+import com.cosroulette.android.activities.MainActivity
+import com.cosroulette.android.adapters.BookmarkAdapter
+import com.cosroulette.android.database.BookmarksDBHelper
+import com.cosroulette.android.database.model.BookmarkModel
 import kotlinx.android.synthetic.main.fragment_bookmarks.*
 
 /**
