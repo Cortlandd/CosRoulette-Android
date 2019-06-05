@@ -31,7 +31,7 @@
 
         <Button
             android:id="@+id/filters_button"
-            android:text="Filters"
+            android:text="@string/filters_button"
             android:textSize="16sp"
             android:gravity="center"
             android:textColor="@android:color/white"

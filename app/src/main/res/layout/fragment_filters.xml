@@ -22,7 +22,7 @@
                 android:layout_height="match_parent"
                 android:fontFamily="monospace"
                 android:gravity="center"
-                android:text="Filters"
+                android:text="@string/filters_button"
                 android:textAlignment="center"
                 android:textColor="#fff"
                 android:textSize="24sp" />
@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:textColor="@android:color/darker_gray"
-                android:text="Swipe to remove" />
+                android:text="@string/filter_instructions" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/filter_recyclerview"

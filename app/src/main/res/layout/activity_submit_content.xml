@@ -66,7 +66,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:text="Under Construction"
+                    android:text="@string/under_construction"
                     android:textStyle="bold"
                     android:gravity="center"
                     android:textSize="32dp"
@@ -85,8 +85,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:hint="https://www.youtube.com/watch?v=hAyxEMo5JVE"
-                    android:textSize="16dp" />
+                    android:hint="@string/sample_youtube_url"
+                    android:textSize="16sp" />
 
                 <Spinner
                     android:id="@+id/submit_content_categories"
@@ -101,7 +101,7 @@
                     android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Submit" />
+                    android:text="@string/submit" />
 
                 <ProgressBar
                     android:id="@+id/submit_content_progressbar"

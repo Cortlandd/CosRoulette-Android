@@ -12,10 +12,10 @@ import kotlinx.android.synthetic.main.activity_about.*
 
 class AboutActivity : AppCompatActivity() {
 
-    var mSectionsPageAdapter: SectionsPageAdapter? = null
-
-    var mViewPager: androidx.viewpager.widget.ViewPager? = null
-
+    // Page section adapter representing multiple pages: FAQ and Open Source Licenses
+    private var mSectionsPageAdapter: SectionsPageAdapter? = null
+    // Android ViewPager
+    private var mViewPager: ViewPager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,11 +23,9 @@ class AboutActivity : AppCompatActivity() {
 
         mSectionsPageAdapter = SectionsPageAdapter(supportFragmentManager)
 
-        mViewPager = findViewById<androidx.viewpager.widget.ViewPager>(R.id.container)
-        setupViewPager(mViewPager!!)
+        setupViewPager(view_pager_container)
 
-        val tabs: TabLayout = findViewById(R.id.tabs)
-        tabs.setupWithViewPager(mViewPager)
+        tabs.setupWithViewPager(view_pager_container)
 
         close_about_fab.setOnClickListener {
             finish()

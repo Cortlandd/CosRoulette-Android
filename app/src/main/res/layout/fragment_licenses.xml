@@ -11,6 +11,6 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="Need Open Source Licenses" />
+        android:text="@string/open_source_licenses" />
 
 </FrameLayout>

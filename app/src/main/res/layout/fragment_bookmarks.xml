@@ -50,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:textColor="@android:color/darker_gray"
-                android:text="Tap to Play, Swipe to remove" />
+                android:text="@string/bookmarks_instructions" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/bookmark_recyclerview"

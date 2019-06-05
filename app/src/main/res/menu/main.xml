@@ -4,8 +4,8 @@
 
     <item
         android:id="@+id/add_item"
-        android:title="Add Filter"
-        android:icon="@android:drawable/ic_menu_add"
+        android:title="@string/add_new_filter_dialog_title"
+        android:icon="@drawable/add_button_white"
         android:visible="true"
         app:showAsAction="always"/>
 

@@ -9,7 +9,6 @@
 
     <TextView
         android:id="@+id/filter_layout_text"
-        android:hint="Filter Text"
         android:padding="10dp"
         android:textSize="20sp"
         android:gravity="center"

@@ -10,3 +10,5 @@ _The Cos Roulette Android App_
 
 # Maybe
 - A play room screen where a user can spin the cylinder all they want with nice effects
+- A quick Help screen that shows where everything is on the MainActivity screen.
+- Colorful Background image in navigation bar

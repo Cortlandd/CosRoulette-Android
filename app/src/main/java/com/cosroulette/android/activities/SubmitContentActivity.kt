@@ -67,4 +67,9 @@ class SubmitContentActivity : AppCompatActivity(), AdapterView.OnItemSelectedLis
                 }.create().show()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        finish()
+    }
+
 }

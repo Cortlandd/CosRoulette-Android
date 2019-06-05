@@ -18,15 +18,10 @@ import android.view.View.VISIBLE
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.widget.*
-import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.snackbar.Snackbar
-import com.lukedeighton.wheelview.WheelView
-import com.lukedeighton.wheelview.adapter.WheelAdapter
 import com.cosroulette.android.BuildConfig
 import com.cosroulette.android.utils.FullScreenHelper
-import com.cosroulette.android.fragments.NewFilterDialogFragment
 import com.cosroulette.android.R
 import com.cosroulette.android.database.BookmarksDBHelper
 import com.cosroulette.android.models.BookmarkModel
@@ -34,13 +29,14 @@ import com.cosroulette.android.fragments.BookmarksFragment
 import com.cosroulette.android.fragments.FiltersFragment
 import com.cosroulette.android.networking.YouTube
 import com.cosroulette.android.utils.FilterPreferences
+import com.lukedeighton.wheelview.WheelView
+import com.lukedeighton.wheelview.adapter.WheelAdapter
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.YouTubePlayerFullScreenListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.utils.YouTubePlayerTracker
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.utils.loadOrCueVideo
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -50,33 +46,36 @@ import org.jetbrains.anko.uiThread
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, BookmarksFragment.OnBookmarkInteractionListener, AdapterView.OnItemSelectedListener, FiltersFragment.OnFilterInteractionListener {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, BookmarksFragment.OnBookmarkInteractionListener, AdapterView.OnItemSelectedListener, FiltersFragment.OnFilterInteractionListener {
 
 
     // Array of filters
     private var filterListItems = ArrayList<String>()
-    // Youtube Player View
-    var playerView: YouTubePlayerView? = null
-    var initializedYouTubePlayer: YouTubePlayer? = null
+    // YouTube Player to be used to play videos.
+    private var initializedYouTubePlayer: YouTubePlayer? = null
     // Array of returned Youtube Videos
     private var youtubeArray = ArrayList<String>()
-    // String representation of the filters created in the ListView. Separated with a space.
+    // String representation of filters from preferences
     private var allFiltersStringText: String = ""
-    private var showMenuItems = false
-    private var selectedItem = -1
+    // Helper to manage screen orientation of YouTubePlayerView
     private var fullScreenHelper: FullScreenHelper = FullScreenHelper(this)
-    private var bookmarkButton: ImageButton? = null
-    private var filterButton: Button? = null
+    // Track the state of YouTubePlayerView
     private var tracker = YouTubePlayerTracker()
-    var bookmarksFragment: BookmarksFragment? = null
-    var filtersFragment: FiltersFragment? = null
-    var fm: FragmentManager? = null
-    var searchResult = ArrayList<MutableMap<String, Any>>()
-    private var wheelView: WheelView? = null
+    // Fragment containing Bookmarks
+    private var bookmarksFragment: BookmarksFragment? = null
+    // Fragment containing Filters
+    private var filtersFragment: FiltersFragment? = null
+    // Managing fragments
+    private var fm: FragmentManager? = null
+    // Result of fetched videos. Includes: videoId, channelTitle, title, and thumbnail
+    private var searchResult = ArrayList<MutableMap<String, Any>>()
+    // Wheel cycle spin sound effect
     private var revolverSpin: MediaPlayer? = null
+    // Full Wheel spin cycle sound effect
     private var revolverFullSpin: MediaPlayer? = null
-    private var baseCategorySpinner: Spinner? = null
+    // Preferences for Filters Manager
     private var mFilterPreferences: FilterPreferences? = null
+    // Listener for changes to Filter Preferences
     private var prefListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,9 +105,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         fm = supportFragmentManager
         revolverSpin = MediaPlayer.create(applicationContext, R.raw.revolver_spin2)
         revolverFullSpin = MediaPlayer.create(applicationContext, R.raw.revolver_full_spin)
-        baseCategorySpinner = findViewById(R.id.base_category)
-        filterButton = findViewById(R.id.filters_button)
-        filterButton?.setOnClickListener {
+        filters_button?.setOnClickListener {
             fm?.beginTransaction()
             filtersFragment?.show(fm, "FILTERS_TAG")
         }
@@ -119,13 +116,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 android.R.layout.simple_spinner_item
         ).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            baseCategorySpinner?.adapter = adapter
+            base_category?.adapter = adapter
         }
-        baseCategorySpinner?.onItemSelectedListener = this
-
-        wheelView = findViewById(R.id.wheelview)
-        wheelView?.isClickable = false
-        wheelView?.adapter = object : WheelAdapter {
+        base_category?.onItemSelectedListener = this
+        
+        wheelview?.isClickable = false
+        wheelview?.adapter = object : WheelAdapter {
 
             override fun getDrawable(position: Int): Drawable? {
                 return null
@@ -136,7 +132,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
 
-        wheelView?.setOnWheelItemSelectedListener(object: WheelView.OnWheelItemSelectListener {
+        wheelview?.setOnWheelItemSelectedListener(object: WheelView.OnWheelItemSelectListener {
 
             override fun onWheelItemSelected(parent: WheelView?, itemDrawable: Drawable?, position: Int) {
                 revolverSpin?.start()
@@ -144,7 +140,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         })
 
-        wheelView?.onWheelItemClickListener = WheelView.OnWheelItemClickListener { parent, position, isSelected ->
+        wheelview?.onWheelItemClickListener = WheelView.OnWheelItemClickListener { parent, position, isSelected ->
             rotate()
             System.out.println("Clicked")
         }
@@ -154,41 +150,39 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onPause() {
         super.onPause()
 
-        if (playerView!!.isFullScreen()) {
-            playerView!!.exitFullScreen()
+        if (player_view!!.isFullScreen()) {
+            player_view!!.exitFullScreen()
         }
 
     }
 
     /**
      *
-     * Roate the wheel image in 360 * 12 degree around the center of the wheel image in 3 seconds
+     * Rotate the cylinder in 360 degrees 12 times around its center for 1 second.
      *
      */
     fun rotate() {
         val mAngleToRotate = 360f * 12 // rotate 12 rounds
         val wheelRotation: RotateAnimation = RotateAnimation(
                 // From degrees
-                wheelView!!.angle,
+                wheelview!!.angle,
                 // To degrees
                 mAngleToRotate,
                 // pivotX
-                wheelView!!.wheelDrawable.bounds.centerX().toFloat(),
+                wheelview!!.wheelDrawable.bounds.centerX().toFloat(),
                 // pivotY
-                wheelView!!.wheelDrawable.bounds.centerY().toFloat()
+                wheelview!!.wheelDrawable.bounds.centerY().toFloat()
         )
         wheelRotation.setDuration(1000) // rotate 12 rounds in 3 seconds
         wheelRotation.setInterpolator(this, android.R.interpolator.accelerate_decelerate)
-        wheelView?.startAnimation(wheelRotation)
+        wheelview?.startAnimation(wheelRotation)
 
         wheelRotation.setAnimationListener(object: Animation.AnimationListener {
-
             override fun onAnimationStart(animation: Animation?) {
                 revolverFullSpin?.start()
             }
 
             override fun onAnimationRepeat(animation: Animation?) {
-
             }
 
             override fun onAnimationEnd(animation: Animation?) {
@@ -205,16 +199,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      */
     private fun initYoutubePlayerView() {
 
-        playerView = findViewById(R.id.player_view)
-        lifecycle.addObserver(playerView!!)
+        lifecycle.addObserver(player_view!!)
 
-        playerView?.addYouTubePlayerListener(object: AbstractYouTubePlayerListener() {
+        player_view?.addYouTubePlayerListener(object: AbstractYouTubePlayerListener() {
+
             override fun onReady(youTubePlayer: YouTubePlayer) {
                 super.onReady(youTubePlayer)
                 initializedYouTubePlayer = youTubePlayer
                 initializedYouTubePlayer!!.addListener(tracker)
                 addFullScreenListener()
-                wheelView?.isClickable = true
+                wheelview?.isClickable = true
                 toast("Ready To Spin")
             }
 
@@ -222,14 +216,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 super.onStateChange(youTubePlayer, state)
                 when (state) {
                     PlayerConstants.PlayerState.UNKNOWN -> {
-                        bookmarkButton?.visibility = GONE
+                        bookmark_button?.visibility = GONE
                     }
                     PlayerConstants.PlayerState.UNSTARTED -> {
-                        bookmarkButton?.visibility = GONE
+                        bookmark_button?.visibility = GONE
                     }
                     else -> {
                         bookmarkValidation()
-                        bookmarkButton?.visibility = VISIBLE
+                        bookmark_button?.visibility = VISIBLE
                     }
                 }
             }
@@ -244,11 +238,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun addFullScreenListener() {
 
         // TODO: There has to be a better way of handling fullscreen and exit fullscreen
-        playerView!!.addFullScreenListener(object: YouTubePlayerFullScreenListener {
+        player_view!!.addFullScreenListener(object: YouTubePlayerFullScreenListener {
             override fun onYouTubePlayerEnterFullScreen() {
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                 supportActionBar?.hide()
-                wheelView?.visibility = GONE
+                wheelview?.visibility = GONE
                 window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                 fullScreenHelper.enterFullScreen()
             }
@@ -256,66 +250,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             override fun onYouTubePlayerExitFullScreen() {
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 supportActionBar?.show()
-                wheelView?.visibility = VISIBLE
+                wheelview?.visibility = VISIBLE
                 window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                 fullScreenHelper.exitFullScreen()
             }
         })
-    }
-
-    override fun onClick(v: View?) {
-
-        if (v == bookmarkButton) {
-
-            var videoId = ""
-            var thumbnail = ""
-            var title = ""
-            var channelTitle = ""
-
-            if (tracker.videoId == null) {
-                Snackbar.make(filters_button, "Search a Video to save as a Bookmark.", Snackbar.LENGTH_LONG).setAction("Action", null).show()
-                return
-            } else {
-                videoId = tracker.videoId!!
-            }
-
-            if (bookmarkButton!!.isSelected and (videoId != "")) {
-                val dbHandler = BookmarksDBHelper(this, null)
-                dbHandler.removeBookmark(videoId)
-                dbHandler.close()
-                bookmarkButton?.isSelected = false
-            } else {
-
-                searchResult.forEach {
-
-                    if (it.values.contains(videoId)) {
-
-                        it.forEach { (key, value) ->
-
-                            when (key) {
-                                "thumbnail" -> {
-                                    thumbnail = value.toString()
-                                }
-                                "title" -> {
-                                    title = value.toString()
-                                }
-                                "channelTitle" -> {
-                                    channelTitle = value.toString()
-                                }
-                            }
-
-                        }
-                    }
-
-                }
-                val dbHandler = BookmarksDBHelper(this, null)
-                val bookmark = BookmarkModel(videoId, title, thumbnail, channelTitle)
-                dbHandler.addBookmark(bookmark)
-                dbHandler.close()
-                bookmarkButton?.isSelected = true
-            }
-        }
-
     }
 
     /**
@@ -326,10 +265,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      */
     private fun searchVideo() {
 
-        bookmarkButton?.isSelected = false
+        bookmark_button?.isSelected = false
 
-        val filterPrefs = mFilterPreferences?.getFilters()!!
-        filterPrefs.forEach {
+        val filterPrefs = mFilterPreferences!!.getFilters()
+        filterPrefs?.forEach {
             filterListItems.add(it.title!!)
         }
 
@@ -341,7 +280,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         allFiltersStringText = filterListItems.joinToString(" ")
 
-        var baseCategoryText = baseCategorySpinner?.selectedItem.toString()
+        var baseCategoryText = base_category?.selectedItem.toString()
 
         var searchParams = listOf(
                 "q" to "$baseCategoryText $allFiltersStringText",
@@ -407,17 +346,58 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
      */
     private fun initializeBookmarksButton() {
 
-        bookmarkButton = findViewById(R.id.bookmark_button)
-        bookmarkButton!!.setOnClickListener(this)
+        bookmark_button.setOnClickListener {
+
+            var videoId = ""
+            var thumbnail = ""
+            var title = ""
+            var channelTitle = ""
+
+            if (tracker.videoId == null) {
+                Snackbar.make(filters_button, "Search content to save it as a bookmark", Snackbar.LENGTH_LONG).setAction("Action", null).show()
+            } else {
+                videoId = tracker.videoId!!
+            }
+
+            if (bookmark_button!!.isSelected and (videoId != "")) {
+                val dbHandler = BookmarksDBHelper(this, null)
+                dbHandler.removeBookmark(videoId)
+                dbHandler.close()
+                bookmark_button?.isSelected = false
+            } else {
+                searchResult.forEach {
+                    if (it.values.contains(videoId)) {
+                        it.forEach { (key, value) ->
+                            when (key) {
+                                "thumbnail" -> {
+                                    thumbnail = value.toString()
+                                }
+                                "title" -> {
+                                    title = value.toString()
+                                }
+                                "channelTitle" -> {
+                                    channelTitle = value.toString()
+                                }
+                            }
+                        }
+                    }
+                }
+                val dbHandler = BookmarksDBHelper(this, null)
+                val bookmark = BookmarkModel(videoId, title, thumbnail, channelTitle)
+                dbHandler.addBookmark(bookmark)
+                dbHandler.close()
+                bookmark_button?.isSelected = true
+            }
+        }
 
     }
 
     private fun bookmarkValidation() {
 
-        if (bookmarkButton!!.isSelected) {
+        if (bookmark_button!!.isSelected) {
             return
         } else {
-            bookmarkButton?.isSelected = false
+            bookmark_button?.isSelected = false
         }
 
         val dbHelper = BookmarksDBHelper(this, null)
@@ -431,9 +411,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             val allBookmarks = dbHelper.allBookmarksList()
             allBookmarks.forEach {
                 // Bookmark is selected state based on if current video is in table
-                //bookmarkButton?.isSelected = it.id == currentVideo
+                //bookmark_button?.isSelected = it.id == currentVideo
                 if (it.videoId == currentVideo) {
-                    bookmarkButton?.isSelected = true
+                    bookmark_button?.isSelected = true
                     return
                 }
             }
@@ -458,8 +438,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
-        } else if(playerView!!.isFullScreen()) {
-            playerView!!.exitFullScreen()
+        } else if (player_view!!.isFullScreen()) {
+            player_view!!.exitFullScreen()
         } else {
             super.onBackPressed()
         }
@@ -504,7 +484,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 var i: Intent = Intent(Intent.ACTION_VIEW, url)
                 startActivity(i)
             }
-            R.id.nav_sendemail -> {
+            R.id.nav_sendfeedback -> {
                 val deviceModel = Build.MODEL
                 val appVersion = BuildConfig.VERSION_NAME
                 val body =

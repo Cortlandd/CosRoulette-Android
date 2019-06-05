@@ -32,8 +32,8 @@
 
             <TextView
                 android:id="@+id/bookmark_title"
-                android:hint="Title"
-                android:textSize="24sp"
+                android:hint="@string/title"
+                android:textSize="20sp"
                 android:textColor="@android:color/black"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
@@ -41,7 +41,7 @@
 
             <TextView
                 android:id="@+id/bookmark_channel_title"
-                android:hint="Channel Title"
+                android:hint="@string/channel_title"
                 android:textColor="@android:color/black"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />

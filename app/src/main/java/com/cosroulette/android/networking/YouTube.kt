@@ -2,6 +2,7 @@ package com.cosroulette.android.networking
 
 
 import android.util.Log
+import com.cosroulette.android.R
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.result.Result
@@ -89,17 +90,13 @@ class YouTube {
         val (request, response, result) = Fuel.get(YOUTUBE_SEARCH_URL, relatedVideoParams).responseObject<YouTubeSearchResponse>()
 
         when (result) {
-
             is Result.Success -> {
                 println("Success")
             }
-
             is Result.Failure -> {
                 println("Error")
             }
-
         }
-
 
     }
 

@@ -58,6 +58,7 @@ class BookmarksFragment : DialogFragment() {
         recyclerView?.adapter = bookmarkAdapter
         bookmarkAdapter?.notifyDataSetChanged()
 
+        // Handle swipe to delete
         val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
 
             override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
@@ -78,7 +79,6 @@ class BookmarksFragment : DialogFragment() {
         closeFab!!.setOnClickListener {
             dismiss()
         }
-
 
         return view
 
@@ -112,6 +112,7 @@ class BookmarksFragment : DialogFragment() {
 
     /**
      * Used to remove swiped Bookmarks
+     * @param id: The id of the book
      */
     fun removeBookmarkItem(id: Int) {
         val dbHelper = BookmarksDBHelper(context!!, null)

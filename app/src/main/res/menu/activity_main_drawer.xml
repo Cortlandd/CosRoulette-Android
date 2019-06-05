@@ -9,46 +9,46 @@
         <item
             android:id="@+id/nav_bookmarks"
             android:icon="@android:drawable/ic_input_get"
-            android:title="Bookmarks" />
+            android:title="@string/nav_bookmarks" />
 
         <item
             android:id="@+id/nav_submit_content"
             android:icon="@android:drawable/ic_menu_edit"
-            android:title="Submit Content"/>
+            android:title="@string/nav_submit_content"/>
     </group>
 
-    <item android:title="Contact">
+    <item android:title="@string/nav_head_contact">
         <menu>
             <item
                 android:id="@+id/nav_instagram"
                 android:icon="@drawable/instagram"
-                android:title="Instagram" />
+                android:title="@string/nav_instagram" />
 
             <item
-                android:id="@+id/nav_sendemail"
+                android:id="@+id/nav_sendfeedback"
                 android:icon="@android:drawable/sym_action_email"
-                android:title="Send Feedback" />
+                android:title="@string/nav_sendfeedback" />
         </menu>
     </item>
 
-    <item android:title="Information">
+    <item android:title="@string/nav_head_information">
         <menu>
             <item
                 android:id="@+id/nav_about"
                 android:icon="@android:drawable/ic_dialog_info"
-                android:title="About" />
+                android:title="@string/nav_about" />
         </menu>
     </item>
 
-    <item android:title="Enjoy Cos Roulette?">
+    <item android:title="@string/nav_head_review">
         <menu>
             <item
                 android:id="@+id/nav_rate_app"
-                android:title="Review in the Play Store"
+                android:title="@string/review_app"
                 />
             <item
                 android:id="@+id/nav_donate"
-                android:title="Donate"
+                android:title="@string/nav_donate"
                 />
         </menu>
     </item>
