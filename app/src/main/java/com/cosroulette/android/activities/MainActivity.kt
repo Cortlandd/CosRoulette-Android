@@ -161,7 +161,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     /**
+     *
      * Roate the wheel image in 360 * 12 degree around the center of the wheel image in 3 seconds
+     *
      */
     fun rotate() {
         val mAngleToRotate = 360f * 12 // rotate 12 rounds
@@ -196,6 +198,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
+    /**
+     *
+     * Method used to initialize YouTubePlayerView.
+     *
+     */
     private fun initYoutubePlayerView() {
 
         playerView = findViewById(R.id.player_view)
@@ -229,6 +236,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         })
     }
 
+    /**
+     *
+     * Method used to handle YouTubePlayerView screen orientation changes.
+     *
+     */
     private fun addFullScreenListener() {
 
         // TODO: There has to be a better way of handling fullscreen and exit fullscreen
@@ -306,6 +318,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
+    /**
+     *
+     * Method used to search videos on youtube using Cos Category, and Filters from perferences
+     * converted to a string of filters spaced in between.
+     *
+     */
     private fun searchVideo() {
 
         bookmarkButton?.isSelected = false
@@ -320,8 +338,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             youtubeArray.clear()
             searchResult.clear()
         }
+
         allFiltersStringText = filterListItems.joinToString(" ")
-        println("\nFilters to string: $allFiltersStringText\n")
 
         var baseCategoryText = baseCategorySpinner?.selectedItem.toString()
 
@@ -382,6 +400,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
+    /**
+     *
+     * Method used to initialize bookmark button.
+     *
+     */
     private fun initializeBookmarksButton() {
 
         bookmarkButton = findViewById(R.id.bookmark_button)
@@ -417,6 +440,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    /**
+     * Method used to initialize Navigation widgets.
+     */
     private fun initializeWidgets() {
 
         val toggle = ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
@@ -510,14 +536,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     /**
-     * Do once a Bookmark is clicked/tapped.
+     *
+     * Method used to handle actions when a Bookmark is clicked/tapped.
+     *
      */
     override fun GetVideoId(videoId: String) {
         playBookmark(videoId)
     }
 
     /**
+     *
      * Fetch video to play from Bookmarks page
+     * @param videoId: The videoId of the Bookmark to play.
+     *
      */
     fun playBookmark(videoId: String) {
         initializedYouTubePlayer!!.loadOrCueVideo(lifecycle, videoId, 0f)
