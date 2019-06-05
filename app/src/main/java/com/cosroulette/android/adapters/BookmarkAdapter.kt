@@ -10,11 +10,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.cosroulette.android.R
 import com.cosroulette.android.database.BookmarksDBHelper
-import com.cosroulette.android.database.model.BookmarkModel
-import com.cosroulette.android.fragments.BookmarksFragment
+import com.cosroulette.android.models.BookmarkModel
 
 import com.cosroulette.android.fragments.BookmarksFragment.OnBookmarkInteractionListener
-import kotlinx.android.synthetic.main.bookmark_layout.view.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 import java.net.URL

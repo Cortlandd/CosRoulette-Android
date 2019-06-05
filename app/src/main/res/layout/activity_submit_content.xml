@@ -88,6 +88,14 @@
                     android:hint="https://www.youtube.com/watch?v=hAyxEMo5JVE"
                     android:textSize="16dp" />
 
+                <Spinner
+                    android:id="@+id/submit_content_categories"
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                </Spinner>
+
                 <Button
                     android:id="@+id/submit_content_submit_button"
                     android:visibility="gone"
@@ -107,12 +115,11 @@
 
     </androidx.core.widget.NestedScrollView>
 
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/close_submit_content_fab"
         android:layout_gravity="bottom"
         android:layout_margin="@dimen/fab_margin"
-        app:backgroundTint="@android:color/darker_gray"
+        app:backgroundTint="@android:color/background_light"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@android:drawable/ic_delete" />

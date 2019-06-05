@@ -5,7 +5,7 @@
 
     <EditText
         android:id="@+id/filter"
-        android:hint="i.e. Black Woman, Fenty, Allisa Ashley, etc"
+        android:hint="i.e. Black Woman, Fenty, Allisa Ashley"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

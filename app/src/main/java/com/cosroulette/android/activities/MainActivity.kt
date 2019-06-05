@@ -1,6 +1,7 @@
 package com.cosroulette.android.activities
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.graphics.drawable.Drawable
 import android.media.MediaPlayer
@@ -11,7 +12,6 @@ import com.google.android.material.navigation.NavigationView
 import androidx.core.view.GravityCompat
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import android.util.Log
 import android.view.*
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -29,9 +29,11 @@ import com.cosroulette.android.utils.FullScreenHelper
 import com.cosroulette.android.fragments.NewFilterDialogFragment
 import com.cosroulette.android.R
 import com.cosroulette.android.database.BookmarksDBHelper
-import com.cosroulette.android.database.model.BookmarkModel
+import com.cosroulette.android.models.BookmarkModel
 import com.cosroulette.android.fragments.BookmarksFragment
+import com.cosroulette.android.fragments.FiltersFragment
 import com.cosroulette.android.networking.YouTube
+import com.cosroulette.android.utils.FilterPreferences
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
@@ -48,19 +50,14 @@ import org.jetbrains.anko.uiThread
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, NewFilterDialogFragment.NewFilterDialogListener, View.OnClickListener, BookmarksFragment.OnBookmarkInteractionListener {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, View.OnClickListener, BookmarksFragment.OnBookmarkInteractionListener, AdapterView.OnItemSelectedListener, FiltersFragment.OnFilterInteractionListener {
+
 
     // Array of filters
     private var filterListItems = ArrayList<String>()
-    // Search Button
-    private var searchButton: Button? = null
-    // Filter ListView
-    private var listView: ListView? = null
     // Youtube Player View
     var playerView: YouTubePlayerView? = null
     var initializedYouTubePlayer: YouTubePlayer? = null
-    // Adapter for filter list
-    private var listAdapter: ArrayAdapter<String>? = null
     // Array of returned Youtube Videos
     private var youtubeArray = ArrayList<String>()
     // String representation of the filters created in the ListView. Separated with a space.
@@ -69,44 +66,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var selectedItem = -1
     private var fullScreenHelper: FullScreenHelper = FullScreenHelper(this)
     private var bookmarkButton: ImageButton? = null
-    private var addFilterButton: Button? = null
+    private var filterButton: Button? = null
     private var tracker = YouTubePlayerTracker()
-    var bookmarksFragment = BookmarksFragment()
+    var bookmarksFragment: BookmarksFragment? = null
+    var filtersFragment: FiltersFragment? = null
     var fm: FragmentManager? = null
     var searchResult = ArrayList<MutableMap<String, Any>>()
     private var wheelView: WheelView? = null
     private var revolverSpin: MediaPlayer? = null
     private var revolverFullSpin: MediaPlayer? = null
-
-    override fun onDialogPositiveClick(dialog: DialogFragment, filter: String) {
-
-        if ("newfilter" == dialog.tag) {
-            filterListItems.add(filter)
-            listAdapter?.notifyDataSetChanged()
-            youtubeArray.clear()
-            searchResult.clear()
-            println("Cleared Youtube Array")
-
-            // TODO: Decide if these are really necessary
-            //Snackbar.make(fab, "Filter Added", Snackbar.LENGTH_LONG).setAction("Action", null).show()
-        } else if ("updatefilter" == dialog.tag) {
-            filterListItems[selectedItem] = filter
-
-            listAdapter?.notifyDataSetChanged()
-
-            selectedItem = -1
-
-            // TODO: Decide if these are really necessary
-            //Snackbar.make(fab, "Filter Updated", Snackbar.LENGTH_LONG).setAction("Action", null).show()
-        }
-
-
-    }
-
-    override fun onDialogNegativeClick(dialog: DialogFragment) {
-        // TODO: Decide if these are really necessary
-        //Snackbar.make(fab, "Cancelled", Snackbar.LENGTH_LONG).setAction("Action", null).show()
-    }
+    private var baseCategorySpinner: Spinner? = null
+    private var mFilterPreferences: FilterPreferences? = null
+    private var prefListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -117,44 +88,40 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         initYoutubePlayerView()
         initializeBookmarksButton()
 
+        bookmarksFragment = BookmarksFragment()
+        filtersFragment = FiltersFragment()
+
+        mFilterPreferences = FilterPreferences(this)
+        prefListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+            when (key) {
+                "filters_list" -> {
+                    youtubeArray.clear()
+                    searchResult.clear()
+                    println("Preferences changed")
+                }
+            }
+        }
+        mFilterPreferences?.getFilterPreferences()!!.registerOnSharedPreferenceChangeListener(prefListener)
+
         fm = supportFragmentManager
         revolverSpin = MediaPlayer.create(applicationContext, R.raw.revolver_spin2)
         revolverFullSpin = MediaPlayer.create(applicationContext, R.raw.revolver_full_spin)
-        searchButton = findViewById(R.id.search_button)
-        searchButton?.setOnClickListener(this)
-        addFilterButton = findViewById(R.id.add_filter_button)
-        addFilterButton?.setOnClickListener { showNewFilterUI() }
-        listView = findViewById(R.id.filter_list)
-        listAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, filterListItems)
-        listView?.adapter = listAdapter
-        //listView?.setOnItemClickListener { parent, view, position, id -> }
-        listView?.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
-
-            // Create Alert Dialog for modifying filters
-            val options = listOf("Edit Filter", "Remove Filter")
-            val adapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_item, options)
-            val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-            builder.setTitle("Choose")
-            builder.setAdapter(adapter) { dialog, which ->
-                when (options.get(which)) {
-                    "Edit Filter" -> {
-                        val updateFragment = NewFilterDialogFragment.newInstance(R.string.update_filter_dialog_title, filterListItems[position])
-                        selectedItem = position
-                        updateFragment.show(supportFragmentManager, "updatefilter")
-                    }
-                    "Remove Filter" -> {
-                        filterListItems.removeAt(position)
-                        listAdapter?.notifyDataSetChanged()
-                        selectedItem = -1
-                    }
-                }
-            }.create().show()
-
+        baseCategorySpinner = findViewById(R.id.base_category)
+        filterButton = findViewById(R.id.filters_button)
+        filterButton?.setOnClickListener {
+            fm?.beginTransaction()
+            filtersFragment?.show(fm, "FILTERS_TAG")
         }
 
-        // Add "tutorials" to filter list by default
-        filterListItems.add("tutorial")
-        listAdapter?.notifyDataSetChanged()
+        ArrayAdapter.createFromResource(
+                this,
+                R.array.cos_categories_array,
+                android.R.layout.simple_spinner_item
+        ).also { adapter ->
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            baseCategorySpinner?.adapter = adapter
+        }
+        baseCategorySpinner?.onItemSelectedListener = this
 
         wheelView = findViewById(R.id.wheelview)
         wheelView?.isClickable = false
@@ -242,7 +209,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 addFullScreenListener()
                 wheelView?.isClickable = true
                 toast("Ready To Spin")
-                //searchButton?.visibility = VISIBLE
             }
 
             override fun onStateChange(youTubePlayer: YouTubePlayer, state: PlayerConstants.PlayerState) {
@@ -265,10 +231,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun addFullScreenListener() {
 
+        // TODO: There has to be a better way of handling fullscreen and exit fullscreen
         playerView!!.addFullScreenListener(object: YouTubePlayerFullScreenListener {
             override fun onYouTubePlayerEnterFullScreen() {
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                 supportActionBar?.hide()
+                wheelView?.visibility = GONE
                 window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                 fullScreenHelper.enterFullScreen()
             }
@@ -276,6 +244,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             override fun onYouTubePlayerExitFullScreen() {
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 supportActionBar?.show()
+                wheelView?.visibility = VISIBLE
                 window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
                 fullScreenHelper.exitFullScreen()
             }
@@ -292,7 +261,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             var channelTitle = ""
 
             if (tracker.videoId == null) {
-                Snackbar.make(add_filter_button, "Search a Video to save as a Bookmark.", Snackbar.LENGTH_LONG).setAction("Action", null).show()
+                Snackbar.make(filters_button, "Search a Video to save as a Bookmark.", Snackbar.LENGTH_LONG).setAction("Action", null).show()
                 return
             } else {
                 videoId = tracker.videoId!!
@@ -341,11 +310,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         bookmarkButton?.isSelected = false
 
+        val filterPrefs = mFilterPreferences?.getFilters()!!
+        filterPrefs.forEach {
+            filterListItems.add(it.title!!)
+        }
+
+        // Clear because sometimes the filter doesn't clear when there is 1 left.
+        if (filterListItems.isEmpty()) {
+            youtubeArray.clear()
+            searchResult.clear()
+        }
         allFiltersStringText = filterListItems.joinToString(" ")
-        Log.i("R allFiltersStringText", allFiltersStringText)
+        println("\nFilters to string: $allFiltersStringText\n")
+
+        var baseCategoryText = baseCategorySpinner?.selectedItem.toString()
 
         var searchParams = listOf(
-                "q" to "makeup tutorials $allFiltersStringText",
+                "q" to "$baseCategoryText $allFiltersStringText",
                 "part" to "id, snippet",
                 "key" to YouTube.API_KEY,
                 "safeSearch" to "none",
@@ -410,7 +391,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun bookmarkValidation() {
 
-        bookmarkButton?.isSelected = false
+        if (bookmarkButton!!.isSelected) {
+            return
+        } else {
+            bookmarkButton?.isSelected = false
+        }
+
         val dbHelper = BookmarksDBHelper(this, null)
 
         var currentVideo: String? = null
@@ -438,11 +424,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
-    }
 
-    private fun showNewFilterUI() {
-        val newFragment = NewFilterDialogFragment.newInstance(R.string.add_new_filter_dialog_title, null)
-        newFragment.show(supportFragmentManager, "newfilter")
+        // Give navigationdrawer items color
+        nav_view.itemIconTintList = null
     }
 
     override fun onBackPressed() {
@@ -458,14 +442,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onResume() {
         super.onResume()
         bookmarkValidation()
+        mFilterPreferences!!.mSharedPreferences?.registerOnSharedPreferenceChangeListener(prefListener)
     }
 
+    /**
+     * Override methods for select options (Hair, Skin, Nails, and Makeup)
+     */
+    override fun onNothingSelected(parent: AdapterView<*>?) {
+
+    }
+
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        if (!youtubeArray.isEmpty()) {
+            youtubeArray.clear()
+            searchResult.clear()
+        }
+    }
+
+    /**
+     * Override method for top left Navigation Drawer
+     */
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
             R.id.nav_bookmarks -> {
                 fm?.beginTransaction()
-                bookmarksFragment.show(fm, "BOOKMARKS_TAG")
+                bookmarksFragment?.show(fm, "BOOKMARKS_TAG")
             }
             R.id.nav_submit_content -> {
                 val i: Intent = Intent(this, SubmitContentActivity::class.java)
@@ -514,10 +516,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         playBookmark(videoId)
     }
 
+    /**
+     * Fetch video to play from Bookmarks page
+     */
     fun playBookmark(videoId: String) {
         initializedYouTubePlayer!!.loadOrCueVideo(lifecycle, videoId, 0f)
         bookmarkValidation()
-        bookmarksFragment.dismiss()
+        bookmarksFragment?.dismiss()
+
+    }
+
+    override fun onFragmentInteraction(uri: Uri) {
 
     }
 

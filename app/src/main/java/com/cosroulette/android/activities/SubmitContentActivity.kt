@@ -16,9 +16,11 @@ import android.view.View.OnTouchListener
 import android.widget.ScrollView
 import android.widget.EditText
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 
 
-class SubmitContentActivity : AppCompatActivity() {
+class SubmitContentActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,9 +35,27 @@ class SubmitContentActivity : AppCompatActivity() {
             alertView("Content Submitted!")
         }
 
+        ArrayAdapter.createFromResource(
+                this,
+                R.array.cos_categories_array,
+                android.R.layout.simple_spinner_item
+        ).also { adapter ->
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            submit_content_categories.adapter = adapter
+        }
+        submit_content_categories.onItemSelectedListener = this
+
         close_submit_content_fab.setOnClickListener {
             finish()
         }
+    }
+
+    override fun onNothingSelected(parent: AdapterView<*>?) {
+
+    }
+
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        parent?.getItemAtPosition(position)
     }
 
     private fun alertView(message: String) {

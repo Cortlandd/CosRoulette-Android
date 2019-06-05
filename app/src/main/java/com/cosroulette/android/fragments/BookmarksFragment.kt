@@ -3,11 +3,9 @@ package com.cosroulette.android.fragments
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,11 +13,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 import com.cosroulette.android.R
-import com.cosroulette.android.activities.MainActivity
 import com.cosroulette.android.adapters.BookmarkAdapter
 import com.cosroulette.android.database.BookmarksDBHelper
-import com.cosroulette.android.database.model.BookmarkModel
-import kotlinx.android.synthetic.main.fragment_bookmarks.*
+import com.cosroulette.android.models.BookmarkModel
 
 /**
  * A simple [DialogFragment] subclass.
@@ -36,7 +32,7 @@ class BookmarksFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogStyle)
+        //setStyle(DialogFragment.STYLE_NORMAL, R.style.FullScreenDialogStyle)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

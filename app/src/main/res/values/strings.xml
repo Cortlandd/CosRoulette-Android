@@ -18,9 +18,17 @@
     <string name="faq">FAQ</string>
     <string name="open_source_licenses">Open Source Licenses</string>
     <string name="submit_content_description">
-        Makeup Roulette gets its content from YouTube. YouTube has a vast amount
-        of content so its difficult to get creators more exposure. In
-        order to get more content creators more exposure we\'ve created our
-        own pool of videos to choose from. All we need is the link to your video.
+        Cos Roulette gets its content from YouTube, but given that YouTube has a vast amount
+        of content, its difficult to get new and small content creators more exposure.
+        In order to alleviate that, we\'ve created our own pool of videos to choose from.
+        All we need is the link to your video and the type of content it produces. (Hair, Makeup, Skin or Nails)
     </string>
+
+    <string-array name="cos_categories_array">
+        <item>Makeup</item>
+        <item>Hair</item>
+        <item>Skin</item>
+        <item>Nails</item>
+    </string-array>
+
 </resources>
