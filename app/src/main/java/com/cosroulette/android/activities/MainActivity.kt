@@ -503,10 +503,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 val emailIntent = Intent(Intent.ACTION_SENDTO)
                 emailIntent.type = "message/rfc822"
-                emailIntent.data = Uri.parse("mailto:cortland12@icloud.com")
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Support - Cos Roulette")
+                emailIntent.data = Uri.parse("mailto:admin@cosroulette.com")
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Support - Android")
                 emailIntent.putExtra(Intent.EXTRA_TEXT, body)
-                startActivity(Intent.createChooser(emailIntent, "Send feedback"))
+                startActivity(Intent.createChooser(emailIntent, "Send Feedback"))
             }
             R.id.nav_about -> {
                 val i: Intent = Intent(this, AboutActivity::class.java)
