@@ -29,6 +29,7 @@ import com.cosroulette.android.fragments.BookmarksFragment
 import com.cosroulette.android.fragments.FiltersFragment
 import com.cosroulette.android.networking.YouTube
 import com.cosroulette.android.utils.FilterPreferences
+import com.cosroulette.android.utils.GlobalPreferences
 import com.lukedeighton.wheelview.WheelView
 import com.lukedeighton.wheelview.adapter.WheelAdapter
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
@@ -73,8 +74,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var revolverSpin: MediaPlayer? = null
     // Full Wheel spin cycle sound effect
     private var revolverFullSpin: MediaPlayer? = null
-    // Preferences for Filters Manager
+    // Preferences for Filters
     private var mFilterPreferences: FilterPreferences? = null
+    // Preferences for Global Preferences
+    private var mGlobalPreferences: GlobalPreferences? = null
     // Listener for changes to Filter Preferences
     private var prefListener: SharedPreferences.OnSharedPreferenceChangeListener? = null
 
@@ -91,6 +94,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         filtersFragment = FiltersFragment()
 
         mFilterPreferences = FilterPreferences(this)
+        mGlobalPreferences = GlobalPreferences(this)
         prefListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
             when (key) {
                 "filters_list" -> {
@@ -101,6 +105,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         }
         mFilterPreferences?.getFilterPreferences()!!.registerOnSharedPreferenceChangeListener(prefListener)
+        mGlobalPreferences?.getGlobalPreferences()!!.registerOnSharedPreferenceChangeListener(prefListener)
 
         fm = supportFragmentManager
         revolverSpin = MediaPlayer.create(applicationContext, R.raw.revolver_spin2)
@@ -119,6 +124,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             base_category?.adapter = adapter
         }
         base_category?.onItemSelectedListener = this
+        base_category?.setSelection(mGlobalPreferences!!.getSelectedCategory())
         
         wheelview?.isClickable = false
         wheelview?.adapter = object : WheelAdapter {
@@ -459,6 +465,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        mGlobalPreferences?.setSelectedCategory(position)
         if (!youtubeArray.isEmpty()) {
             youtubeArray.clear()
             searchResult.clear()

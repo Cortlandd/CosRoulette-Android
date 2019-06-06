@@ -8,16 +8,23 @@ import com.google.android.gms.cast.VastAdsRequest.fromJson
 
 
 
-class FilterPreferences {
+class FilterPreferences(context: Context) {
 
     var mSharedPreferences: SharedPreferences? = null
     var PREFS_NAME: String = "filters_pref"
     var FILTERS_PREF_NAME: String = "filters_list"
 
-    constructor(context: Context) {
+    init {
         this.mSharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     }
 
+    /**
+     *
+     * Add the created filter to SharedPreferences.
+     *
+     * @param filter: The filter to be added.
+     *
+     */
     fun addFilter(filter: FilterModel) {
 
         var filters = getFilters()
@@ -38,6 +45,13 @@ class FilterPreferences {
     fun updateFilter(filter: FilterModel) {
     }
 
+    /**
+     *
+     * Remove the filter at the specified index from SharedPreferences.
+     *
+     * @param filterIndex: The index of the filter to be removed.
+     *
+     */
     fun removeFilter(filterIndex: Int) {
         val filters = getFilters()
         if (filters != null) {
@@ -51,6 +65,13 @@ class FilterPreferences {
         }
     }
 
+    /**
+     *
+     * Get all filters from SharedPreferences as an ArrayList of FilterModel(s)
+     *
+     * @return ArrayList<FilterModel>
+     *
+     */
     fun getFilters(): ArrayList<FilterModel>? {
 
         var filters = ArrayList<FilterModel>()
@@ -68,6 +89,11 @@ class FilterPreferences {
         return filters
     }
 
+    /**
+     *
+     * Return global SharedPreferences variable in FilterPreferences.
+     *
+     */
     fun getFilterPreferences(): SharedPreferences? {
         return mSharedPreferences
     }

@@ -24,11 +24,11 @@ class YouTube {
         fun search_youtube(search_params: List<Pair<String, Any?>>): ArrayList<MutableMap<String, Any>> {
 
             // List of videos returned
-            var videosArray = arrayListOf(mutableMapOf<String, Any>())
-            var mVideosArray = mutableMapOf<String, Any>()
+            var videosArrayHolder = arrayListOf(mutableMapOf<String, Any>())
+            var mVideosArray: MutableMap<String, Any>
 
             // HTTP Request. Calling on NONE blocking mode in
-            val (request, response, result) = Fuel.get(YOUTUBE_SEARCH_URL, search_params).responseObject<YouTubeSearchResponse>()
+            val (request, _, result) = Fuel.get(YOUTUBE_SEARCH_URL, search_params).responseObject<YouTubeSearchResponse>()
 
             // Log the requested link
             Log.i("Request URL", request.url.toString())
@@ -43,7 +43,7 @@ class YouTube {
                                 "thumbnail" to it.snippet.thumbnails.default.url,
                                 "channelTitle" to it.snippet.channelTitle
                         )
-                        videosArray.addAll(listOf(mVideosArray))
+                        videosArrayHolder.addAll(listOf(mVideosArray))
                     }
                 }
                 is Result.Failure -> {
@@ -51,7 +51,7 @@ class YouTube {
                 }
             }
 
-            return videosArray
+            return videosArrayHolder
         }
     }
 
