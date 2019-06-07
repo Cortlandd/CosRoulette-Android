@@ -125,6 +125,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         base_category?.onItemSelectedListener = this
         base_category?.setSelection(mGlobalPreferences!!.getSelectedCategory())
+        if (base_category?.selectedItemPosition != 0) {
+            category_help_text.visibility = VISIBLE
+        } else {
+            category_help_text.visibility = GONE
+        }
         
         wheelview?.isClickable = false
         wheelview?.adapter = object : WheelAdapter {
@@ -147,8 +152,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         })
 
         wheelview?.onWheelItemClickListener = WheelView.OnWheelItemClickListener { parent, position, isSelected ->
-            rotate()
-            System.out.println("Clicked")
+            if (base_category.selectedItemPosition != 0) {
+                rotate()
+            } else {
+                toast("Select Content")
+            }
         }
 
     }
@@ -286,9 +294,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         allFiltersStringText = filterListItems.joinToString(" ")
 
-        var baseCategoryText = base_category?.selectedItem.toString()
+        var baseCategoryText = ""
 
-        var searchParams = listOf(
+        if (base_category.selectedItemPosition != 0) {
+            baseCategoryText = base_category?.selectedItem.toString()
+        }
+
+        println("Base Category Text: $baseCategoryText")
+
+        val searchParams = listOf(
                 "q" to "$baseCategoryText $allFiltersStringText",
                 "part" to "id, snippet",
                 "key" to YouTube.API_KEY,
@@ -466,6 +480,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         mGlobalPreferences?.setSelectedCategory(position)
+
+        var selectedItemText = parent?.getItemAtPosition(position).toString()
+
+        if (parent!!.getItemAtPosition(position).equals("Select Content")) {
+            category_help_text.visibility = GONE
+        } else {
+            category_help_text.visibility = VISIBLE
+        }
+
+
         if (!youtubeArray.isEmpty()) {
             youtubeArray.clear()
             searchResult.clear()

@@ -12,7 +12,8 @@
     <string name="edit">Edit</string>
     <string name="title">Title</string>
     <string name="channel_title">Channel Title</string>
-    <string name="filters_button">Filters</string>
+    <string name="filters_button">Add\n Filters</string>
+    <string name="filters_heading">Add Filter</string>
     <string name="delete">Delete</string>
     <string name="nav_bookmarks">Bookmarks</string>
     <string name="nav_submit_content">Submit Content</string>
@@ -24,7 +25,7 @@
     <string name="nav_head_review">Enjoy Cos Roulette?</string>
     <string name="review_app">Review in the Play Store</string>
     <string name="nav_donate">Donate</string>
-    <string name="filter_instructions">Swipe to remove</string>
+    <string name="filter_instructions">Swipe to remove Filter</string>
     <string name="bookmarks_instructions">Tap to Play, Swipe to remove</string>
     <string name="filter_example_text">i.e. Black Woman, Fenty, Allisa Ashley</string>
     <string name="under_construction">Under Construction</string>
@@ -39,8 +40,14 @@
         In order to alleviate that, we\'ve created our own pool of videos to choose from.
         All we need is the link to your video and the type of content it produces. (Hair, Makeup, Skin or Nails)
     </string>
+    <string name="filter_instructions_text">
+        Tap the <b>+</b> button above to add filters. Filters allow for filtering of Selected Content.
+        You can filter by your favorite content creator, your race, favorite brand, etc.
+    </string>
+    <string name="category_help_text">Selected Content</string>
 
     <string-array name="cos_categories_array">
+        <item>Select Content</item>
         <item>Makeup</item>
         <item>Hair</item>
         <item>Skin</item>

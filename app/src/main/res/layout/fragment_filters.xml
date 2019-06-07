@@ -22,7 +22,7 @@
                 android:layout_height="match_parent"
                 android:fontFamily="monospace"
                 android:gravity="center"
-                android:text="@string/filters_button"
+                android:text="@string/filters_heading"
                 android:textAlignment="center"
                 android:textColor="#fff"
                 android:textSize="24sp" />
@@ -48,11 +48,18 @@
             android:layout_height="wrap_content">
 
             <TextView
+                android:id="@+id/filter_instruction_text"
+                android:text="@string/filter_instructions_text"
+                android:gravity="center_horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
                 android:id="@+id/filters_help_text"
                 android:layout_width="match_parent"
+                android:layout_below="@id/filter_instruction_text"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:textColor="@android:color/darker_gray"
                 android:text="@string/filter_instructions" />
 
             <androidx.recyclerview.widget.RecyclerView

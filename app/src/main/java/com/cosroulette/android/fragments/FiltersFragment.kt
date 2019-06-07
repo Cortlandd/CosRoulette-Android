@@ -4,7 +4,10 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.view.*
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.appcompat.widget.Toolbar
@@ -42,6 +45,8 @@ class FiltersFragment : DialogFragment(), Toolbar.OnMenuItemClickListener {
     var filterToolbar: Toolbar? = null
     var mFilterPreferences: FilterPreferences? = null
     var closeFab: FloatingActionButton? = null
+    var filterInstructions: TextView? = null
+    var filterHelp: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,6 +61,9 @@ class FiltersFragment : DialogFragment(), Toolbar.OnMenuItemClickListener {
         mFilterPreferences?.getFilters()?.let { mFilters.addAll(it) }
 
         closeFab = view.findViewById(R.id.close_filters_fab)
+
+        filterInstructions = view.findViewById(R.id.filter_instruction_text)
+        filterHelp = view.findViewById(R.id.filters_help_text)
 
         filterToolbar = view.findViewById(R.id.filter_toolbar)
         filterToolbar?.inflateMenu(R.menu.main)
@@ -80,6 +88,7 @@ class FiltersFragment : DialogFragment(), Toolbar.OnMenuItemClickListener {
                 mFilterPreferences?.removeFilter(position)
                 mFilters.removeAt(position)
                 recyclerView!!.adapter?.notifyItemRemoved(position)
+                validateFilterSize()
             }
 
         }
@@ -115,6 +124,8 @@ class FiltersFragment : DialogFragment(), Toolbar.OnMenuItemClickListener {
             }
 
         }))
+
+        validateFilterSize()
 
         closeFab!!.setOnClickListener {
             dismiss()
@@ -162,6 +173,7 @@ class FiltersFragment : DialogFragment(), Toolbar.OnMenuItemClickListener {
                             val filter = FilterModel(filterText.text.toString())
                             mFilterPreferences?.addFilter(filter)
                             filterAdapter?.setData(mFilterPreferences?.getFilters()!!)
+                            validateFilterSize()
                             //recyclerView!!.adapter?.notifyDataSetChanged()
 
                         }
@@ -174,6 +186,17 @@ class FiltersFragment : DialogFragment(), Toolbar.OnMenuItemClickListener {
         }
 
         return true
+    }
+
+    fun validateFilterSize() {
+
+        if (mFilterPreferences?.getFilters()!!.isEmpty()) {
+            filterInstructions?.visibility = VISIBLE
+            filterHelp?.visibility = GONE
+        } else {
+            filterHelp?.visibility = VISIBLE
+            filterInstructions?.visibility = GONE
+        }
     }
 
     /**
