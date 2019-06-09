@@ -14,8 +14,8 @@
         <activity
             android:name=".activities.SubmitContentActivity"
             android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
-            android:theme="@style/AppTheme.NoActionBar.FullScreen"
-            android:label="Submit Content" />
+            android:label="Submit Content"
+            android:theme="@style/AppTheme.NoActionBar.FullScreen" />
         <activity
             android:name=".activities.AboutActivity"
             android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"

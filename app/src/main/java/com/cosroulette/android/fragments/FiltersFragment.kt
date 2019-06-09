@@ -190,12 +190,15 @@ class FiltersFragment : DialogFragment(), Toolbar.OnMenuItemClickListener {
 
     fun validateFilterSize() {
 
-        if (mFilterPreferences?.getFilters()!!.isEmpty()) {
+        val filters = mFilterPreferences!!.getFilters()
+        if (filters.isNullOrEmpty()) {
             filterInstructions?.visibility = VISIBLE
             filterHelp?.visibility = GONE
+            filterAdapter?.notifyDataSetChanged()
         } else {
             filterHelp?.visibility = VISIBLE
             filterInstructions?.visibility = GONE
+            filterAdapter?.notifyDataSetChanged()
         }
     }
 
