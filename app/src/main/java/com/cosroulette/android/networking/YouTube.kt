@@ -11,49 +11,49 @@ import com.cosroulette.android.data.YouTubeVideoResponse
 import java.util.*
 import kotlin.collections.ArrayList
 
-class YouTube {
+object YouTube {
 
-    companion object {
+    const val API_KEY = "AIzaSyB3sP8V6Ufg0BUaf7YntWUv1aygEAP2lfQ"
 
-        const val API_KEY = "AIzaSyB3sP8V6Ufg0BUaf7YntWUv1aygEAP2lfQ"
+    const val YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search"
 
-        const val YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search"
+    const val YOUTUBE_VIDEO_URL = "https://www.googleapis.com/youtube/v3/videos"
 
-        const val YOUTUBE_VIDEO_URL = "https://www.googleapis.com/youtube/v3/videos"
+    fun search_youtube(search_params: List<Pair<String, Any?>>): ArrayList<MutableMap<String, Any>> {
 
-        fun search_youtube(search_params: List<Pair<String, Any?>>): ArrayList<MutableMap<String, Any>> {
+        // List of videos returned
+        var videosArrayHolder = arrayListOf(mutableMapOf<String, Any>())
+        var mVideosArray: MutableMap<String, Any>
 
-            // List of videos returned
-            var videosArrayHolder = arrayListOf(mutableMapOf<String, Any>())
-            var mVideosArray: MutableMap<String, Any>
+        // HTTP Request. Calling on NONE blocking mode in
+        val (request, _, result) = Fuel.get(YOUTUBE_SEARCH_URL, search_params).responseObject<YouTubeSearchResponse>()
 
-            // HTTP Request. Calling on NONE blocking mode in
-            val (request, _, result) = Fuel.get(YOUTUBE_SEARCH_URL, search_params).responseObject<YouTubeSearchResponse>()
+        // Log the requested link
+        Log.i("Request URL", request.url.toString())
 
-            // Log the requested link
-            Log.i("Request URL", request.url.toString())
+        when (result) {
 
-            when (result) {
-                is Result.Success -> {
-                    println("Success ")
-                    result.get().items.forEach {
-                        mVideosArray = mutableMapOf(
-                                "videoId" to it.id.videoId,
-                                "title" to it.snippet.title,
-                                "thumbnail" to it.snippet.thumbnails.default.url,
-                                "channelTitle" to it.snippet.channelTitle
-                        )
-                        videosArrayHolder.addAll(listOf(mVideosArray))
-                    }
-                }
-                is Result.Failure -> {
-                    println("Error ")
+            is Result.Success -> {
+                println("Success ")
+                result.get().items.forEach {
+                    mVideosArray = mutableMapOf(
+                            "videoId" to it.id.videoId,
+                            "title" to it.snippet.title,
+                            "thumbnail" to it.snippet.thumbnails.default.url,
+                            "channelTitle" to it.snippet.channelTitle
+                    )
+                    videosArrayHolder.addAll(listOf(mVideosArray))
                 }
             }
 
-            return videosArrayHolder
+            is Result.Failure -> {
+                println("Error ")
+            }
         }
+
+        return videosArrayHolder
     }
+
 
     fun fetchVideoData(videoId: String) {
 
@@ -99,7 +99,5 @@ class YouTube {
         }
 
     }
-
-
 
 }

@@ -20,12 +20,16 @@ import android.view.View
 import android.view.View.*
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import com.cosroulette.android.networking.NetworkManager
+import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
-
-
+import org.jetbrains.anko.uiThread
+import java.util.regex.Pattern
 
 
 class SubmitContentActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +40,7 @@ class SubmitContentActivity : AppCompatActivity(), AdapterView.OnItemSelectedLis
             inputManager.hideSoftInputFromWindow(submit_content_url.windowToken, InputMethodManager.SHOW_FORCED)
         }
 
-        var mURLTextWatcher = object : TextWatcher {
+        val mURLTextWatcher = object : TextWatcher {
 
             override fun afterTextChanged(s: Editable?) {
                 validateUrl()
@@ -63,15 +67,25 @@ class SubmitContentActivity : AppCompatActivity(), AdapterView.OnItemSelectedLis
         submit_content_categories.onItemSelectedListener = this
 
         submit_content_submit_button.setOnClickListener {
-            if (validateUrl() and validateCategory()) {
-                submit_content_progressbar.visibility = VISIBLE
-                submit_content_submit_button.visibility = GONE
-                toast("ITS GOOD")
 
-                // TODO: Network Request
+            submit_content_progressbar.visibility = VISIBLE
+            submit_content_submit_button.visibility = GONE
 
-            } else {
-                toast("ITS BAD")
+            val videoId = getVideoIdFromYoutubeUrl(submit_content_url.text.toString())
+            val category = submit_content_categories.selectedItem.toString()
+
+            var status: Int
+
+            doAsync {
+                status = NetworkManager.submissionApproval(videoId!!, category)
+
+                uiThread {
+                    if (status != 200) {
+                        failedSubmission()
+                    } else {
+                        successfulSubmission()
+                    }
+                }
             }
         }
 
@@ -80,26 +94,29 @@ class SubmitContentActivity : AppCompatActivity(), AdapterView.OnItemSelectedLis
         }
     }
 
-    fun validateUrl(): Boolean {
+    private fun validateUrl(): Boolean {
 
         return if (isYoutubeUrl(submit_content_url.text.toString())) {
             valid_youtube_url_text.visibility = VISIBLE
             invalid_youtube_url_text.visibility = GONE
+            submit_content_submit_button.isEnabled = true
             true
         } else {
             invalid_youtube_url_text.visibility = VISIBLE
             valid_youtube_url_text.visibility = GONE
+            submit_content_submit_button.isEnabled = false
             false
         }
 
     }
 
-    fun validateCategory(): Boolean {
+    private fun validateCategory(): Boolean {
 
         return if (submit_content_categories.selectedItemPosition != 0) {
+            submit_content_submit_button.isEnabled = true
             true
         } else {
-            toast("Select a Category for your Content")
+            submit_content_submit_button.isEnabled = false
             false
         }
 
@@ -113,11 +130,22 @@ class SubmitContentActivity : AppCompatActivity(), AdapterView.OnItemSelectedLis
         parent?.getItemAtPosition(position)
     }
 
-    private fun alertView(message: String) {
+    private fun successfulSubmission() {
         val dialog = AlertDialog.Builder(this)
-        dialog.setTitle("Submit Content")
-                .setMessage(message)
+        dialog.setTitle("Content Submission")
+                .setMessage("Your content has been submitted for Approval.").setIcon(android.R.drawable.presence_online)
                 .setPositiveButton("OK") { dialoginterface, i ->
+                    finish() // Close activity to reduce spam. And submitting content costs an Ad
+                }.create().show()
+    }
+
+    private fun failedSubmission() {
+        val dialog = AlertDialog.Builder(this)
+        dialog.setTitle("Content Submission")
+                .setMessage("There was an issue submitting your content.").setIcon(android.R.drawable.ic_delete)
+                .setPositiveButton("OK") { dialoginterface, i ->
+                    submit_content_progressbar.visibility = GONE
+                    submit_content_submit_button.visibility = VISIBLE
                     dialoginterface.dismiss()
                 }.create().show()
     }
@@ -127,16 +155,32 @@ class SubmitContentActivity : AppCompatActivity(), AdapterView.OnItemSelectedLis
         finish()
     }
 
-    fun isYoutubeUrl(youTubeURl: String): Boolean {
+    private fun isYoutubeUrl(youTubeURl: String): Boolean {
         val success: Boolean
         val pattern = "^(http(s)?:\\/\\/)?((w){3}.)?youtu(be|.be)?(\\.com)?\\/.+"
-        if (!youTubeURl.isEmpty() && youTubeURl.matches(pattern.toRegex())) {
-            success = true
-        } else {
-            // Not Valid youtube URL
-            success = false
-        }
+        success = !youTubeURl.isEmpty() && youTubeURl.matches(pattern.toRegex())
         return success
+    }
+
+    fun getVideoIdFromYoutubeUrl(youtubeUrl: String): String? {
+        /*
+           Possibile Youtube urls.
+           http://www.youtube.com/watch?v=WK0YhfKqdaI
+           http://www.youtube.com/embed/WK0YhfKqdaI
+           http://www.youtube.com/v/WK0YhfKqdaI
+           http://www.youtube-nocookie.com/v/WK0YhfKqdaI?version=3&hl=en_US&rel=0
+           http://www.youtube.com/watch?v=WK0YhfKqdaI
+           http://www.youtube.com/watch?feature=player_embedded&v=WK0YhfKqdaI
+           http://www.youtube.com/e/WK0YhfKqdaI
+           http://youtu.be/WK0YhfKqdaI
+        */
+        val pattern = "(?<=watch\\?v=|/videos/|embed\\/|youtu.be\\/|\\/v\\/|\\/e\\/|watch\\?v%3D|watch\\?feature=player_embedded&v=|%2Fvideos%2F|embed%\u200C\u200B2F|youtu.be%2F|%2Fv%2F)[^#\\&\\?\\n]*"
+        val compiledPattern = Pattern.compile(pattern)
+        //url is youtube url for which you want to extract the id.
+        val matcher = compiledPattern.matcher(youtubeUrl)
+        return if (matcher.find()) {
+            matcher.group()
+        } else null
     }
 
 }
