@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.SubmitContentActivity">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/submit_content_appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
@@ -34,94 +36,86 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
-        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_below="@+id/submit_content_appbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:orientation="vertical"
+            android:id="@+id/submit_content_help_text"
+            android:layout_margin="20dp"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
-            <LinearLayout
-                android:layout_margin="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:text="@string/submit_content_description"
-                    android:textStyle="italic"
-                    android:gravity="center"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_marginTop="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+            <TextView
+                android:text="@string/submit_content_description"
+                android:textStyle="italic"
                 android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:text="@string/under_construction"
-                    android:textStyle="bold"
-                    android:gravity="center"
-                    android:textSize="32dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-                <TextView
-                    android:text="Will be available in upcoming updates..."
-                    android:textStyle="italic"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-                <EditText
-                    android:id="@+id/submit_content_url"
-                    android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:hint="@string/sample_youtube_url"
-                    android:textSize="16sp" />
-
-                <Spinner
-                    android:id="@+id/submit_content_categories"
-                    android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                </Spinner>
-
-                <Button
-                    android:id="@+id/submit_content_submit_button"
-                    android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/submit" />
-
-                <ProgressBar
-                    android:id="@+id/submit_content_progressbar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone" />
-
-            </LinearLayout>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
-    </androidx.core.widget.NestedScrollView>
+        <EditText
+            android:id="@+id/submit_content_url"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:hint="@string/sample_youtube_url"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/invalid_youtube_url_text"
+            android:text="Invalid URL"
+            android:visibility="gone"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@android:color/holo_red_dark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/valid_youtube_url_text"
+            android:text="Valid URL"
+            android:visibility="gone"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@android:color/holo_green_dark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Spinner
+            android:id="@+id/submit_content_categories"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        </Spinner>
+
+        <Button
+            android:id="@+id/submit_content_submit_button"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/submit" />
+
+        <ProgressBar
+            android:id="@+id/submit_content_progressbar"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/close_submit_content_fab"
-        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
         android:layout_margin="@dimen/fab_margin"
         app:backgroundTint="@android:color/background_light"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@android:drawable/ic_delete" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</RelativeLayout>

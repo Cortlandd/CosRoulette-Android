@@ -47,7 +47,7 @@
     <string name="category_help_text">Selected Content</string>
 
     <string-array name="cos_categories_array">
-        <item>Select Content</item>
+        <item>Select Category</item>
         <item>Makeup</item>
         <item>Hair</item>
         <item>Skin</item>
