@@ -88,7 +88,6 @@ class SubmitContentActivity : AppCompatActivity(), AdapterView.OnItemSelectedLis
                 }
             }
         }
-        successfulSubmission()
 
         close_submit_content_fab.setOnClickListener {
             finish()

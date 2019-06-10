@@ -90,9 +90,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         initYoutubePlayerView()
         initializeBookmarksButton()
 
-        bookmarksFragment = BookmarksFragment()
-        filtersFragment = FiltersFragment()
-
         mFilterPreferences = FilterPreferences(this)
         mGlobalPreferences = GlobalPreferences(this)
         prefListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
@@ -111,6 +108,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         revolverSpin = MediaPlayer.create(applicationContext, R.raw.revolver_spin2)
         revolverFullSpin = MediaPlayer.create(applicationContext, R.raw.revolver_full_spin)
         filters_button?.setOnClickListener {
+            filtersFragment = FiltersFragment()
             fm?.beginTransaction()
             filtersFragment?.show(fm, "FILTERS_TAG")
         }
@@ -503,6 +501,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Handle navigation view item clicks here.
         when (item.itemId) {
             R.id.nav_bookmarks -> {
+                bookmarksFragment = BookmarksFragment()
                 fm?.beginTransaction()
                 bookmarksFragment?.show(fm, "BOOKMARKS_TAG")
             }
