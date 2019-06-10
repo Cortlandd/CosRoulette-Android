@@ -88,6 +88,7 @@ class SubmitContentActivity : AppCompatActivity(), AdapterView.OnItemSelectedLis
                 }
             }
         }
+        successfulSubmission()
 
         close_submit_content_fab.setOnClickListener {
             finish()
@@ -130,10 +131,12 @@ class SubmitContentActivity : AppCompatActivity(), AdapterView.OnItemSelectedLis
         parent?.getItemAtPosition(position)
     }
 
+    // TODO: People WILL want to know if their content is successfully submitted.
     private fun successfulSubmission() {
         val dialog = AlertDialog.Builder(this)
         dialog.setTitle("Content Submission")
-                .setMessage("Your content has been submitted for Approval.").setIcon(android.R.drawable.presence_online)
+                .setMessage("Your content has been submitted.")
+                .setIcon(R.drawable.ic_checkmark)
                 .setPositiveButton("OK") { dialoginterface, i ->
                     finish() // Close activity to reduce spam. And submitting content costs an Ad
                 }.create().show()

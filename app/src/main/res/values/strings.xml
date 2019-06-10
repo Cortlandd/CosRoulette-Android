@@ -47,15 +47,11 @@
     <string name="category_help_text">Selected Content</string>
 
     <string-array name="cos_categories_array">
-        <item>Select Category</item>
+        <item>Select Content</item>
         <item>Makeup</item>
         <item>Hair</item>
         <item>Skin</item>
         <item>Nails</item>
     </string-array>
-    <string name="title_activity_main2">Main2Activity</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
 
 </resources>
