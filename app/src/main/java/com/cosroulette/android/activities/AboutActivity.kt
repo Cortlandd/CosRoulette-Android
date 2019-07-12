@@ -36,7 +36,7 @@ class AboutActivity : AppCompatActivity() {
     fun setupViewPager(viewPager: ViewPager) {
         var adapter: SectionsPageAdapter = SectionsPageAdapter(supportFragmentManager)
         adapter.addFragment(FAQFragment(), "FAQ")
-        adapter.addFragment(LicensesFragment(), "Open Source Licenses")
+        //adapter.addFragment(LicensesFragment(), "Open Source Licenses")
         viewPager.adapter = adapter
     }
 

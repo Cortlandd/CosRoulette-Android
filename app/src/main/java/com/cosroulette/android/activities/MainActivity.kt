@@ -505,10 +505,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 fm?.beginTransaction()
                 bookmarksFragment?.show(fm, "BOOKMARKS_TAG")
             }
-            R.id.nav_submit_content -> {
-                val i: Intent = Intent(this, SubmitContentActivity::class.java)
-                startActivity(i)
-            }
             R.id.nav_instagram -> {
                 var url: Uri = Uri.parse("https://instagram.com/cosroulette")
                 var i: Intent = Intent(Intent.ACTION_VIEW, url)

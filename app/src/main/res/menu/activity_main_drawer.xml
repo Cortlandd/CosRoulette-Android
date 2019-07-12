@@ -11,15 +11,12 @@
             android:icon="@android:drawable/ic_input_get"
             android:title="@string/nav_bookmarks" />
 
-        <item
-            android:id="@+id/nav_submit_content"
-            android:icon="@android:drawable/ic_menu_edit"
-            android:title="@string/nav_submit_content"/>
     </group>
 
     <item android:title="@string/nav_head_contact">
         <menu>
             <item
+                android:visible="false"
                 android:id="@+id/nav_instagram"
                 android:icon="@drawable/instagram"
                 android:title="@string/nav_instagram" />
